@@ -35,6 +35,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.emojisemanticsearch.entity.EmojiEntity
 import com.example.emojisemanticsearch.ui.theme.EmojiSemanticSearchTheme
 import com.example.emojisemanticsearch.utils.saveToClipboard
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
-                        val viewModel: MainViewModel = viewModel()
+                        val viewModel: MainViewModel = getViewModel()
                         val uiState by viewModel.uiState.collectAsState()
                         LaunchedEffect(key1 = true) {
                             viewModel.fetchSuccessAfter2s()
