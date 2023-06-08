@@ -23,13 +23,12 @@ def get_embeddings(inp: List[str]) -> List[List[float]]:
 	sequence_output = outputs[0]
 	return sequence_output[:, 0, :].numpy().tolist()
 
-def write_jsonl(filename: str, data: List[Dict]):
-    assert filename.endswith(".jsonl.gz")
+def write_to_json(filename: str, data: List[Dict]):
+    assert filename.endswith(".json.gz")
     with open(filename, "wb") as fp:
         with gzip.GzipFile(fileobj=fp, mode="wb") as gz:
             for x in tqdm.tqdm(data):
                 gz.write((json.dumps(x) + "\n").encode("utf-8"))
-
 
 def extract_emoji_messages() -> Dict[str, str]:
 	data = open(os.path.join(SERVER_DIR, "Python/emoji-data.txt")).readlines()
@@ -54,7 +53,6 @@ def extract_emoji_messages() -> Dict[str, str]:
 	emoji_dict_swap = {v: k for k, v in emojis_full_msg_dedupe.items()}
 	return emoji_dict_swap
 
-
 def main():
 	# Query embeddings
 	emoji_messages = extract_emoji_messages()
@@ -65,12 +63,14 @@ def main():
 	print("first embeddings of emoji: ", embeddings[0], "\nlen embeddings: ", len(embeddings))
 
 	# # Save embeddings
-	# info = [
-	# 	{"emoji": em, "message": msg, "embed": embed} 
-	# 	for (em, msg), embed in zip(emoji_messages.items(), embeddings)
-	# ]
-	# output_filename = os.path.join(SERVER_DIR, "emoji-embeddings.jsonl.gz")
-	# write_jsonl(output_filename, info)
+	info = [
+		{"emoji": em, "message": msg, "embed": embed} 
+		for (em, msg), embed in zip(emoji_messages.items(), embeddings)
+	]
+	print("first 2th info of emoji: ", info[:2], "\nlen info: ", len(info))
+
+	output_filename = os.path.join(SERVER_DIR, "Python/emoji-embeddings.json.gz")
+	write_to_json(output_filename, info)
 
 
 if __name__ == "__main__":
