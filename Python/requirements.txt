@@ -1,3 +1,6 @@
 emoji
 transformers
 torch
+flask
+jsonlines
+flask_cors
