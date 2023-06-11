@@ -2,7 +2,6 @@ import gzip
 import json
 import os
 from typing import Dict, List
-import shutil
 
 import emoji
 import tqdm
@@ -25,33 +24,6 @@ def get_embeddings(inp: List[str]) -> List[List[float]]:
 		
 	sequence_output = outputs[0]
 	return sequence_output[:, 0, :].numpy().tolist()
-
-def export_embedding_model():
-	class MobileBertModelSimpleOutput(MobileBertModel):
-		def forward(self, input_ids=None, attention_mask=None, token_type_ids=None):
-			outputs = super().forward(
-				input_ids=input_ids,
-				attention_mask=attention_mask,
-				token_type_ids=token_type_ids
-			)
-			return outputs.last_hidden_state
-
-	tokenizer = MobileBertTokenizer.from_pretrained('google/mobilebert-uncased')
-	model = MobileBertModelSimpleOutput.from_pretrained('google/mobilebert-uncased')
-
-	tokenizer.save_pretrained(os.path.join(MODEL_DIR, "mobilebert_tokenizer"))
-
-	model.eval()
-	example_input_text = "show me the emoji for love but not the one with the heart"
-	encodings = tokenizer.encode_plus(example_input_text, max_length=16, padding='max_length', truncation=True, return_tensors='pt')
-	traced_script_module = torch.jit.trace(model, (encodings['input_ids'], encodings['attention_mask'], encodings['token_type_ids']))
-	traced_script_module.save(os.path.join(MODEL_DIR, "traced_mobilebert.pt"))
-
-	with open(os.path.join(MODEL_DIR, "traced_mobilebert.pt"), 'rb') as f_in:
-		with gzip.open(os.path.join(MODEL_DIR, "traced_mobilebert.pt.gz"), 'wb') as f_out:
-			shutil.copyfileobj(f_in, f_out)
-
-	os.remove(os.path.join(MODEL_DIR, "traced_mobilebert.pt"))
 
 def write_to_json(filename: str, data: List[Dict]):
     assert filename.endswith(".json.gz")
@@ -101,8 +73,6 @@ def main():
 
 	output_filename = os.path.join(EMOJI_DATA_DIR, "emoji-embeddings.json.gz")
 	write_to_json(output_filename, info)
-
-	export_embedding_model()
 
 
 if __name__ == "__main__":
