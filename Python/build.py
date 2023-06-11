@@ -5,25 +5,30 @@ from typing import Dict, List
 
 import emoji
 import tqdm
-from transformers import MobileBertTokenizer, MobileBertModel
+from transformers import BertTokenizer, BertModel
 import torch
 
 SERVER_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 MODEL_DIR = os.path.join(SERVER_DIR, "Python/model")
 EMOJI_DATA_DIR = os.path.join(SERVER_DIR, "Python/emoji_data")
 
-def get_embeddings(inp: List[str]) -> List[List[float]]:
-	tokenizer = MobileBertTokenizer.from_pretrained('google/mobilebert-uncased')
-	model = MobileBertModel.from_pretrained('google/mobilebert-uncased')
+def get_embeddings(inps: List[str]) -> List[List[float]]:
+	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-	encodings = tokenizer.batch_encode_plus(inp, add_special_tokens=True, padding='longest')
-	print("first encodings: ", encodings['input_ids'][0], "\nlen encodings: ", len(encodings['input_ids']))
-	input_ids = torch.tensor(encodings['input_ids'])
-	with torch.no_grad():
-		outputs = model(input_ids)
-		
-	sequence_output = outputs[0]
-	return sequence_output[:, 0, :].numpy().tolist()
+	tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+	model = BertModel.from_pretrained('bert-base-uncased')
+	model.to(device)
+
+	result = []
+	for inp in inps:
+		encodings = tokenizer(inp, return_tensors="pt")
+		encodings = {key: val.to(device) for key, val in encodings.items()}
+		outputs = model(**encodings)
+		sequence_output = outputs[0]
+		embed = sequence_output[:, 0, :].detach().cpu().numpy().flatten().tolist()
+		result.append(embed)
+
+	return result
 
 def write_to_json(filename: str, data: List[Dict]):
     assert filename.endswith(".json.gz")

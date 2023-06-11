@@ -6,7 +6,7 @@ import jsonlines
 import numpy as np
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from transformers import MobileBertTokenizer, MobileBertModel
+from transformers import BertTokenizer, BertModel
 import torch
 
 SERVER_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -18,6 +18,7 @@ class EmojiSearchApp:
         self._embeddings = None
         self._tokenizer = None
         self._model = None
+        self._device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     def _load_emoji_embeddings(self):
         if self._emojis is not None and self._embeddings is not None:
@@ -32,8 +33,9 @@ class EmojiSearchApp:
         assert self._emojis is not None and self._embeddings is not None
 
     def _init_tokenizer_and_model(self):
-        self._tokenizer = MobileBertTokenizer.from_pretrained('google/mobilebert-uncased')
-        self._model = MobileBertModel.from_pretrained('google/mobilebert-uncased')
+        self._tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        self._model = BertModel.from_pretrained('bert-base-uncased')
+        self._model.to(self._device)
 
     @property
     def emojis(self):
@@ -60,22 +62,19 @@ class EmojiSearchApp:
         return self._model
 
     def get_emoji_embedding(self, text: str) -> List[float]:
-        encodings = self.tokenizer.encode_plus(text, add_special_tokens=True, return_tensors='pt')
-        print("get_emoji_embedding, encodings: ", encodings['input_ids'])
-        input_ids = torch.tensor(encodings['input_ids'])
-        with torch.no_grad():
-            outputs = self.model(input_ids)
-            
+        encodings = self.tokenizer(text, return_tensors="pt")
+        encodings = {key: val.to(self._device) for key, val in encodings.items()}
+        outputs = self.model(**encodings)
         sequence_output = outputs[0]
-        return sequence_output[0, 0, :].numpy()
+        return sequence_output[:, 0, :].detach().cpu().numpy()
 
     def get_top_relevant_emojis(self, query: str, k: int = 20) -> List[dict]:
         query_embed = self.get_emoji_embedding(query)
-        print("get_top_relevant_emojis, query_embed: ", query_embed, "shape of query_embed: ", query_embed.shape)
+        print("get_top_relevant_emojis, shape of query_embed: ", query_embed.shape)
         print("get_top_relevant_emojis, shape of embeddings: ", np.array(self.embeddings).shape)
-        dotprod = np.matmul(self.embeddings, query_embed)
+        dotprod = np.matmul(self.embeddings, query_embed.T).reshape(-1)
         m_dotprod = np.median(dotprod)
-        print("get_top_relevant_emojis, len(dotprod): ", len(dotprod), "shape of dotprod: ", dotprod.shape)
+        print("get_top_relevant_emojis, dotprod: ", dotprod, "shape of dotprod: ", dotprod.shape)
         ind = np.argpartition(dotprod, -k)[-k:]
         ind = ind[np.argsort(dotprod[ind])][::-1]
         print("get_top_relevant_emojis, ind: ", ind)
@@ -113,7 +112,7 @@ class EmojiSearchApp:
 # app.run()
 
 def main():
-    query = "Goodbye emoji"
+    query = "I love you"
     emoji_search_app = EmojiSearchApp()
     result = emoji_search_app.get_top_relevant_emojis(query, k=5)
     print("result: ", result)
