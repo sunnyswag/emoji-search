@@ -1,6 +1,3 @@
 emoji
-transformers
-torch
-flask
+openai
 jsonlines
-flask_cors
