@@ -71,7 +71,7 @@ def main():
 	]
 	print("first 2th info of emoji: ", info[:2], "\nlen info: ", len(info))
 
-	output_filename = os.path.join(EMOJI_DATA_DIR, "emoji-embeddings.json.gz")
+	output_filename = os.path.join(EMOJI_DATA_DIR, "emoji_embeddings.gz")
 	write_to_json(output_filename, info)
 
 

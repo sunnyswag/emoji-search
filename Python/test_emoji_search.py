@@ -10,7 +10,7 @@ openai.api_base = "https://api.openai.com/v1"
 EMBEDDING_MODEL = "text-embedding-ada-002"
 
 SERVER_DIR = os.path.dirname(os.path.abspath(__file__))
-EMBED_FILE = os.path.join(SERVER_DIR, os.path.join("emoji_data", "emoji-embeddings.json.gz"))
+EMBED_FILE = os.path.join(SERVER_DIR, os.path.join("emoji_data", "emoji_embeddings.gz"))
 
 class EmojiSearchApp:
     def __init__(self):
