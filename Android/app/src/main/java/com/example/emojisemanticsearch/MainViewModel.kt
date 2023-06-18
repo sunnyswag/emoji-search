@@ -22,8 +22,8 @@ class MainViewModel(
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             withContext(Dispatchers.IO) {
-                 val result = embeddingRepository.getEmbedding("test")
-                _uiState.emit(UiState.Success(testData(), result))
+//                 val result = embeddingRepository.getEmbedding("test")
+                _uiState.emit(UiState.Success(testData(), "result"))
             }
         }
     }

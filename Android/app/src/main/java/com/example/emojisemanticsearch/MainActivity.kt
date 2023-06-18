@@ -1,6 +1,7 @@
 package com.example.emojisemanticsearch
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,8 +32,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.emojisemanticsearch.entity.EmojiEntity
+import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiEmbeddings
 import com.example.emojisemanticsearch.ui.theme.EmojiSemanticSearchTheme
 import com.example.emojisemanticsearch.utils.saveToClipboard
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -40,6 +41,9 @@ import org.koin.androidx.viewmodel.ext.android.getViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Log.d(TAG, "emojiEmbeddings size: ${emojiEmbeddings.size}" +
+                " last emoji data: ${emojiEmbeddings.lastOrNull()}")
         setContent {
             EmojiSemanticSearchTheme {
                 // A surface container using the 'background' color from the theme
@@ -71,6 +75,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
     }
 }
 
@@ -120,6 +128,8 @@ fun SearchEmoji(modifier: Modifier) {
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(
             onSearch = {
+                Log.d("MainActivity", "emojiEmbeddings size: ${emojiEmbeddings.size}" +
+                        " last emoji data: ${emojiEmbeddings.lastOrNull()}")
                 Toast.makeText(
                     context,
                     "Search for ${searchText.text}",
