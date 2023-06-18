@@ -22,7 +22,7 @@ class MainViewModel(
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             withContext(Dispatchers.IO) {
-//                 val result = embeddingRepository.getEmbedding("test")
+                 embeddingRepository.getEmbedding()
                 _uiState.emit(UiState.Success(testData(), "result"))
             }
         }

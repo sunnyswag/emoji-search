@@ -61,11 +61,6 @@ class MainActivity : ComponentActivity() {
                         SearchEmoji(modifier = Modifier.fillMaxWidth())
                         if (uiState is UiState.Success) {
                             val uiState = uiState as UiState.Success
-                            Toast.makeText(
-                                this@MainActivity,
-                                uiState.embeddingTest,
-                                Toast.LENGTH_SHORT
-                            ).show()
                             DisplayEmoji(
                                 uiState.data,
                                 modifier = Modifier.fillMaxWidth()
@@ -107,7 +102,7 @@ fun EmojiItem(emojiEntity: EmojiEntity) {
             modifier = Modifier.padding(10.dp)
         )
         Text(
-            text = emojiEntity.name,
+            text = emojiEntity.message,
             modifier = Modifier.padding(10.dp)
         )
     }

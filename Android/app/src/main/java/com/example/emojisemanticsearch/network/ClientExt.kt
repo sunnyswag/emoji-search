@@ -14,4 +14,4 @@ fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
 
 fun provideOpenAIAPI(retrofit: Retrofit): OpenAIAPI = retrofit.create(OpenAIAPI::class.java)
 
-const val baseUrl = "https://api.openai.com/v1/"
+const val baseUrl = "https://api.openai.com/"
