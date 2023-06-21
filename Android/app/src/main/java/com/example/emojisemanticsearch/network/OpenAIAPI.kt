@@ -1,5 +1,6 @@
 package com.example.emojisemanticsearch.network
 
+import com.example.emojisemanticsearch.BuildConfig
 import com.example.emojisemanticsearch.entity.EmbeddingRequest
 import com.example.emojisemanticsearch.entity.EmbeddingResponse
 import retrofit2.http.Body
@@ -10,7 +11,7 @@ interface OpenAIAPI {
 
     @Headers(
         "Content-Type:application/json",
-        "Authorization:Bearer API_KEY"
+        "Authorization:Bearer ${BuildConfig.API_KEY}"
     )
     @POST("v1/embeddings")
     suspend fun getEmbedding(@Body request: EmbeddingRequest): EmbeddingResponse
