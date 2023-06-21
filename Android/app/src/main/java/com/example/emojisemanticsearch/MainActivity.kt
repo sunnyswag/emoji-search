@@ -42,8 +42,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.d(TAG, "emojiEmbeddings size: ${emojiEmbeddings.size}" +
-                " last emoji data: ${emojiEmbeddings.lastOrNull()}")
+        Log.d(TAG, "emojiEmbeddings size: ${emojiEmbeddings.size}, " +
+                " embedding data size: ${emojiEmbeddings.lastOrNull()?.embed?.size}")
         setContent {
             EmojiSemanticSearchTheme {
                 // A surface container using the 'background' color from the theme
@@ -123,8 +123,9 @@ fun SearchEmoji(modifier: Modifier) {
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(
             onSearch = {
-                Log.d("MainActivity", "emojiEmbeddings size: ${emojiEmbeddings.size}" +
-                        " last emoji data: ${emojiEmbeddings.lastOrNull()}")
+                Log.d(
+                    "MainActivity", "emojiEmbeddings size: ${emojiEmbeddings.size}, " +
+                        " embedding data size: ${emojiEmbeddings.lastOrNull()?.embed?.size}")
                 Toast.makeText(
                     context,
                     "Search for ${searchText.text}",

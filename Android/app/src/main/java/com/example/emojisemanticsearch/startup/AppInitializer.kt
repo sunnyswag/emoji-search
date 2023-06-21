@@ -45,6 +45,7 @@ class AppInitializer : Initializer<Unit> {
 
     companion object {
         const val TAG = "AppInitializer"
+        // size: 3753, 1536
         var emojiEmbeddings: MutableList<EmojiEmbedding> = mutableListOf()
     }
 }
