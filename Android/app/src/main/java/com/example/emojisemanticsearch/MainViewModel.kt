@@ -19,12 +19,10 @@ class MainViewModel(
 
 
     fun fetchSuccessAfter2s() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
-            withContext(Dispatchers.IO) {
-                 embeddingRepository.getEmbedding()
-                _uiState.emit(UiState.Success(testData(), "result"))
-            }
+            embeddingRepository.getEmbedding()
+            _uiState.emit(UiState.Success(testData(), "result"))
         }
     }
 

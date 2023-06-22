@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.emojisemanticsearch.entity.EmojiEntity
+import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiData
 import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiEmbeddings
 import com.example.emojisemanticsearch.ui.theme.EmojiSemanticSearchTheme
 import com.example.emojisemanticsearch.utils.saveToClipboard
@@ -42,8 +43,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.d(TAG, "emojiEmbeddings size: ${emojiEmbeddings.size}, " +
-                " embedding data size: ${emojiEmbeddings.lastOrNull()?.embed?.size}")
+        Log.d(TAG, "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.length}")
         setContent {
             EmojiSemanticSearchTheme {
                 // A surface container using the 'background' color from the theme
@@ -124,8 +124,9 @@ fun SearchEmoji(modifier: Modifier) {
         keyboardActions = KeyboardActions(
             onSearch = {
                 Log.d(
-                    "MainActivity", "emojiEmbeddings size: ${emojiEmbeddings.size}, " +
-                        " embedding data size: ${emojiEmbeddings.lastOrNull()?.embed?.size}")
+                    "MainActivity",
+                    "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.length}"
+                )
                 Toast.makeText(
                     context,
                     "Search for ${searchText.text}",

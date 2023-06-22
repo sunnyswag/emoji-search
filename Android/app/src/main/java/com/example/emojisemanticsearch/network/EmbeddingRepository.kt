@@ -8,9 +8,13 @@ class EmbeddingRepository(private val openAIAPI: OpenAIAPI) {
     suspend fun getEmbedding(
         text: EmbeddingRequest = EmbeddingRequest("I love you")
     ): List<EmojiEntity> {
-        openAIAPI.getEmbedding(text).embeddings.firstOrNull().let {
-            Log.d(TAG, "getEmbedding from request: $it")
+        kotlin.runCatching {
+            openAIAPI.getEmbedding(text).embeddings.firstOrNull()?.let { embedding ->
+                Log.d(TAG, "getEmbedding: $embedding")
+
+            }
         }
+
         return listOf(
             EmojiEntity(
                 emoji = text.input,

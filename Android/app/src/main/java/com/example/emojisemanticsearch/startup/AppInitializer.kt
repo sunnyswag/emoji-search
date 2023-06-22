@@ -5,11 +5,14 @@ import android.content.Context
 import android.util.Log
 import androidx.startup.Initializer
 import com.example.emojisemanticsearch.R
-import com.example.emojisemanticsearch.entity.EmojiEmbedding
+import com.example.emojisemanticsearch.entity.EmojiEntity
+import com.example.emojisemanticsearch.entity.EmojiJsonEntity
 import com.example.emojisemanticsearch.utils.toBean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.jetbrains.bio.viktor.F64Array
+import org.jetbrains.bio.viktor.asF64Array
 import java.util.zip.GZIPInputStream
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
@@ -35,8 +38,17 @@ class AppInitializer : Initializer<Unit> {
         context.resources.openRawResource(R.raw.emoji_embeddings).use { inputStream ->
             GZIPInputStream(inputStream).use { gzipInputStream ->
                 gzipInputStream.bufferedReader().useLines { lines ->
-                    lines.forEach { line ->
-                        line.toBean<EmojiEmbedding>()?.let { emojiEmbeddings.add(it) }
+                    lines.forEachIndexed { index, line ->
+                        line.toBean<EmojiJsonEntity>()?.let { emojiJsonEntity ->
+                            if (index >= EMOJI_EMBEDDING_SIZE) {
+                                Log.e(TAG, "emoji embeddings size is out of range, index: $index, "
+                                    + "size: $EMOJI_EMBEDDING_SIZE, emoji: ${emojiJsonEntity.emoji}")
+                                return@forEachIndexed
+                            }
+
+                            emojiData.add(EmojiEntity(emojiJsonEntity.emoji, emojiJsonEntity.message))
+                            emojiEmbeddings.V[index] = emojiJsonEntity.embed.asF64Array()
+                        }
                     }
                 }
             }
@@ -45,7 +57,10 @@ class AppInitializer : Initializer<Unit> {
 
     companion object {
         const val TAG = "AppInitializer"
+        private const val EMOJI_EMBEDDING_SIZE = 3753
+        private const val EMBEDDING_LENGTH_PER_EMOJI = 1536
         // size: 3753, 1536
-        var emojiEmbeddings: MutableList<EmojiEmbedding> = mutableListOf()
+        val emojiEmbeddings = F64Array(EMOJI_EMBEDDING_SIZE, EMBEDDING_LENGTH_PER_EMOJI)
+        val emojiData: MutableList<EmojiEntity> = mutableListOf()
     }
 }
