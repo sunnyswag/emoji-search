@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.emojisemanticsearch.entity.EmojiEntity
 import com.example.emojisemanticsearch.network.EmbeddingRepository
+import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -20,40 +21,11 @@ class MainViewModel(
     fun searchEmojis(userInput: String = "I love you") {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
-            embeddingRepository.getEmbedding(userInput)
-            _uiState.emit(UiState.Success(testData(), "result"))
+            embeddingRepository.getEmbedding(userInput).getOrNull()?.let { indexes ->
+                _uiState.emit(UiState.Success(indexes.map { emojiData[it] }))
+            }
         }
     }
-
-    private fun testData() = listOf(
-        EmojiEntity("🐶", "Dog"),
-        EmojiEntity("🐱", "Cat"),
-        EmojiEntity("🐭", "Mouse"),
-        EmojiEntity("🐹", "Hamster"),
-        EmojiEntity("🐰", "Rabbit"),
-        EmojiEntity("🦊", "Fox"),
-        EmojiEntity("🐻", "Bear"),
-        EmojiEntity("🐼", "Panda"),
-        EmojiEntity("🐻‍❄️", "Polar Bear"),
-        EmojiEntity("🐶", "Dog"),
-        EmojiEntity("🐱", "Cat"),
-        EmojiEntity("🐭", "Mouse"),
-        EmojiEntity("🐹", "Hamster"),
-        EmojiEntity("🐰", "Rabbit"),
-        EmojiEntity("🦊", "Fox"),
-        EmojiEntity("🐻", "Bear"),
-        EmojiEntity("🐼", "Panda"),
-        EmojiEntity("🐻‍❄️", "Polar Bear"),
-        EmojiEntity("🐶", "Dog"),
-        EmojiEntity("🐱", "Cat"),
-        EmojiEntity("🐭", "Mouse"),
-        EmojiEntity("🐹", "Hamster"),
-        EmojiEntity("🐰", "Rabbit"),
-        EmojiEntity("🦊", "Fox"),
-        EmojiEntity("🐻", "Bear"),
-        EmojiEntity("🐼", "Panda"),
-        EmojiEntity("🐻‍❄️", "Polar Bear")
-    )
 }
 
 val viewModelModule = module {
@@ -62,7 +34,7 @@ val viewModelModule = module {
 
 sealed class UiState {
     object Loading: UiState()
-    data class Success(val data: List<EmojiEntity>, val embeddingTest: String): UiState()
+    data class Success(val data: List<EmojiEntity>): UiState()
     data class Error(val message: String): UiState()
     object Default: UiState()
 }
