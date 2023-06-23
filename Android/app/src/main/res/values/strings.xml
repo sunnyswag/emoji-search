@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">emojiSemanticSearch</string>
-    <string name="network_error">Network Error</string>
-    <string name="computation_error">Computation Error</string>
+    <string name="app_name">Emoji Search</string>
+    <string name="network_error">Network error, click to try again.</string>
+    <string name="computation_error">Computation error, click to try again.</string>
 </resources>

@@ -6,6 +6,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,8 +35,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
@@ -62,9 +72,12 @@ class MainActivity : ComponentActivity() {
                             viewModel.initState()
                         }
 
-                        SearchEmojiField(modifier = Modifier.fillMaxWidth()) {
-                            viewModel.searchEmojis(it)
-                        }
+                        SearchEmojiField(modifier = Modifier.fillMaxWidth(),
+                            onSearch = {
+                                viewModel.searchEmojis(it)
+                            }, onClickDeleteAll = {
+                                viewModel.initState()
+                            })
                         val modifier = Modifier.fillMaxSize()
                         when (uiState) {
                             is UiState.Loading -> {
@@ -116,9 +129,7 @@ fun EmojiItem(emojiEntity: EmojiEntity) {
             saveToClipboard(context, emojiEntity.emoji)
             Toast
                 .makeText(
-                    context,
-                    "Copied ${emojiEntity.emoji} to clipboard",
-                    Toast.LENGTH_SHORT
+                    context, "Copy ${emojiEntity.emoji} to clipboard", Toast.LENGTH_SHORT
                 )
                 .show()
         }) {
@@ -133,29 +144,56 @@ fun EmojiItem(emojiEntity: EmojiEntity) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
+    ExperimentalAnimationApi::class
+)
 @Composable
-fun SearchEmojiField(modifier: Modifier, onSearch: (String) -> Unit = {}) {
+fun SearchEmojiField(
+    modifier: Modifier,
+    onSearch: (String) -> Unit = {},
+    onClickDeleteAll: () -> Unit = {}
+) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
-    val context = LocalContext.current
+    val controller = LocalSoftwareKeyboardController.current
 
-    TextField(
-        value = searchText,
+    TextField(value = searchText,
         placeholder = { Text("Find the most relevant emojis") },
         onValueChange = { searchText = it },
+        leadingIcon = {
+            Image(
+                painterResource(id = R.drawable.search),
+                contentDescription = "search",
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
+            )
+        },
+        trailingIcon = {
+            AnimatedVisibility (
+                visible = searchText.text.isNotEmpty(),
+                enter = scaleIn(),
+                exit = scaleOut()
+            ) {
+                Image(
+                    painterResource(id = R.drawable.delete_all_text),
+                    contentDescription = "delete_text",
+                    modifier = Modifier.clickable {
+                        searchText = TextFieldValue("")
+                        onClickDeleteAll()
+                    },
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
+                )
+            }
+        },
         modifier = modifier.padding(10.dp),
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(
-            onSearch = {
-                Log.d(
-                    "MainActivity",
-                    "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.shape}"
-                )
-                onSearch(searchText.text)
-            }
-        )
-    )
+        keyboardActions = KeyboardActions(onSearch = {
+            Log.d(
+                "MainActivity",
+                "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.shape}"
+            )
+            onSearch(searchText.text)
+            controller?.hide()
+        }))
 }
 
 @Composable
@@ -184,7 +222,7 @@ fun DefaultPage(modifier: Modifier = Modifier) {
 @Composable
 fun LoadingPage(modifier: Modifier = Modifier) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        Text(text = "Loading...")
+        CircularProgressIndicator()
     }
 }
 
