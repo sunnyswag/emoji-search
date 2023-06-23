@@ -3,7 +3,7 @@ package com.example.emojisemanticsearch.entity
 data class EmojiJsonEntity(
     val emoji: String,
     val message: String,
-    val embed: DoubleArray
+    val embed: FloatArray
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

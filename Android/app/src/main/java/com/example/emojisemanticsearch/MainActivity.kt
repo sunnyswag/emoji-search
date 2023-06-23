@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.d(TAG, "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.length}")
+        Log.d(TAG, "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.shape}")
         setContent {
             EmojiSemanticSearchTheme {
                 // A surface container using the 'background' color from the theme
@@ -55,10 +55,12 @@ class MainActivity : ComponentActivity() {
                         val viewModel: MainViewModel = getViewModel()
                         val uiState by viewModel.uiState.collectAsState()
                         LaunchedEffect(key1 = true) {
-                            viewModel.fetchSuccessAfter2s()
+                            viewModel.searchEmojis()
                         }
 
-                        SearchEmoji(modifier = Modifier.fillMaxWidth())
+                        SearchEmoji(modifier = Modifier.fillMaxWidth()) {
+                            viewModel.searchEmojis(it)
+                        }
                         if (uiState is UiState.Success) {
                             val uiState = uiState as UiState.Success
                             DisplayEmoji(
@@ -110,7 +112,7 @@ fun EmojiItem(emojiEntity: EmojiEntity) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchEmoji(modifier: Modifier) {
+fun SearchEmoji(modifier: Modifier, onSearch: (String) -> Unit = {}) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     val context = LocalContext.current
 
@@ -125,13 +127,14 @@ fun SearchEmoji(modifier: Modifier) {
             onSearch = {
                 Log.d(
                     "MainActivity",
-                    "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.length}"
+                    "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.shape}"
                 )
                 Toast.makeText(
                     context,
                     "Search for ${searchText.text}",
                     Toast.LENGTH_SHORT
                 ).show()
+                onSearch(searchText.text)
             }
         )
     )

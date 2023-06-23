@@ -7,7 +7,6 @@ import com.example.emojisemanticsearch.network.EmbeddingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -18,10 +17,10 @@ class MainViewModel(
     val uiState get() = _uiState
 
 
-    fun fetchSuccessAfter2s() {
+    fun searchEmojis(userInput: String = "I love you") {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = UiState.Loading
-            embeddingRepository.getEmbedding()
+            embeddingRepository.getEmbedding(userInput)
             _uiState.emit(UiState.Success(testData(), "result"))
         }
     }
