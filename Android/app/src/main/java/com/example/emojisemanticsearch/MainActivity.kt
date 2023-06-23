@@ -5,7 +5,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,8 +28,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,18 +59,33 @@ class MainActivity : ComponentActivity() {
                         val viewModel: MainViewModel = getViewModel()
                         val uiState by viewModel.uiState.collectAsState()
                         LaunchedEffect(key1 = true) {
-                            viewModel.searchEmojis()
+                            viewModel.initState()
                         }
 
-                        SearchEmoji(modifier = Modifier.fillMaxWidth()) {
+                        SearchEmojiField(modifier = Modifier.fillMaxWidth()) {
                             viewModel.searchEmojis(it)
                         }
-                        if (uiState is UiState.Success) {
-                            val uiState = uiState as UiState.Success
-                            DisplayEmoji(
-                                uiState.data,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                        val modifier = Modifier.fillMaxSize()
+                        when (uiState) {
+                            is UiState.Loading -> {
+                                LoadingPage(modifier)
+                            }
+                            is UiState.Success -> {
+                                val state = uiState as UiState.Success
+                                DisplayEmoji(
+                                    state.data,
+                                    modifier = modifier
+                                )
+                            }
+                            is UiState.Error -> {
+                                val state = uiState as UiState.Error
+                                ErrorPage(modifier, state.message) {
+                                    viewModel.reSearchEmojis()
+                                }
+                            }
+                            is UiState.Default -> {
+                                DefaultPage(modifier)
+                            }
                         }
                     }
                 }
@@ -91,14 +110,18 @@ fun DisplayEmoji(emojiData: List<EmojiEntity>, modifier: Modifier = Modifier) {
 @Composable
 fun EmojiItem(emojiEntity: EmojiEntity) {
     val context = LocalContext.current
-    Row(modifier = Modifier.clickable {
-        saveToClipboard(context, emojiEntity.emoji)
-        Toast.makeText(
-            context,
-            "Copied ${emojiEntity.emoji} to clipboard",
-            Toast.LENGTH_SHORT
-        ).show()
-    }) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .clickable {
+            saveToClipboard(context, emojiEntity.emoji)
+            Toast
+                .makeText(
+                    context,
+                    "Copied ${emojiEntity.emoji} to clipboard",
+                    Toast.LENGTH_SHORT
+                )
+                .show()
+        }) {
         Text(
             text = emojiEntity.emoji,
             modifier = Modifier.padding(10.dp)
@@ -112,7 +135,7 @@ fun EmojiItem(emojiEntity: EmojiEntity) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchEmoji(modifier: Modifier, onSearch: (String) -> Unit = {}) {
+fun SearchEmojiField(modifier: Modifier, onSearch: (String) -> Unit = {}) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     val context = LocalContext.current
 
@@ -129,21 +152,46 @@ fun SearchEmoji(modifier: Modifier, onSearch: (String) -> Unit = {}) {
                     "MainActivity",
                     "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.shape}"
                 )
-                Toast.makeText(
-                    context,
-                    "Search for ${searchText.text}",
-                    Toast.LENGTH_SHORT
-                ).show()
                 onSearch(searchText.text)
             }
         )
     )
 }
 
+@Composable
+fun ErrorPage(
+    modifier: Modifier = Modifier,
+    @StringRes message: Int,
+    clickErrorPage: () -> Unit = {}
+) {
+    Box(
+        modifier = modifier.clickable { clickErrorPage() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(id = message),
+        )
+    }
+}
+
+@Composable
+fun DefaultPage(modifier: Modifier = Modifier) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        Text(text = "Search for emojis")
+    }
+}
+
+@Composable
+fun LoadingPage(modifier: Modifier = Modifier) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        Text(text = "Loading...")
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun SearchEmojiPreview() {
     EmojiSemanticSearchTheme {
-        SearchEmoji(modifier = Modifier.fillMaxWidth())
+        SearchEmojiField(modifier = Modifier.fillMaxWidth())
     }
 }

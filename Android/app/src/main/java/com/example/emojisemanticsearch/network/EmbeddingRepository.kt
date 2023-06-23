@@ -16,7 +16,8 @@ class EmbeddingRepository(private val openAIAPI: OpenAIAPI) {
             val networkResult = openAIAPI.getEmbedding(EmbeddingRequest(userInput))
             networkResult.embeddings.firstOrNull()?.embedding?.let { embedding ->
                 if (embedding.size == EMBEDDING_LENGTH_PER_EMOJI) {
-                    val embeddingReshaped = mk.ndarray(embedding).reshape(EMBEDDING_LENGTH_PER_EMOJI, 1)
+                    val embeddingReshaped =
+                        mk.ndarray(embedding).reshape(EMBEDDING_LENGTH_PER_EMOJI, 1)
                     val dotResult = emojiEmbeddings.dot(embeddingReshaped).flatten().toList()
                     topKIndices(dotResult, topK)
                 } else {
