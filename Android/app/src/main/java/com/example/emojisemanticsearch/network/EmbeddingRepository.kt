@@ -7,10 +7,6 @@ import com.example.emojisemanticsearch.startup.AppInitializer.Companion.EMBEDDIN
 import com.example.emojisemanticsearch.startup.AppInitializer.Companion.EMOJI_EMBEDDING_SIZE
 import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiData
 import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiEmbeddings
-import org.jetbrains.kotlinx.multik.api.linalg.dot
-import org.jetbrains.kotlinx.multik.api.mk
-import org.jetbrains.kotlinx.multik.api.ndarray
-import org.jetbrains.kotlinx.multik.ndarray.operations.toList
 import java.lang.Float.max
 import java.lang.Float.min
 import kotlin.time.ExperimentalTime
@@ -26,11 +22,9 @@ class EmbeddingRepository(private val openAIAPI: OpenAIAPI) {
                 .also { Log.d(TAG, "getEmbedding network time: $it") }
             networkResult.embeddings.firstOrNull()?.embedding?.let { embedding ->
                 if (embedding.size == EMBEDDING_LENGTH_PER_EMOJI) {
-                    var result: List<Int>? = null
+                    var result: List<Int>?
                     measureTime {
-                        val embeddingReshaped =
-                            mk.ndarray(embedding).reshape(EMBEDDING_LENGTH_PER_EMOJI, 1)
-                        val dotResult = emojiEmbeddings.dot(embeddingReshaped).flatten().toList()
+                        val dotResult = calculateDot(emojiEmbeddings, embedding)
                         result = topKIndices(dotResult, getScaledTopK(topK))
                     }.also { Log.d(TAG, "getEmbedding process time: $it") }
                     result
@@ -45,7 +39,18 @@ class EmbeddingRepository(private val openAIAPI: OpenAIAPI) {
     companion object {
         private const val TAG = "EmbeddingRepository"
 
-        fun topKIndices(list: List<Float>, k: Int): List<Int> {
+        fun calculateDot(embeddings: Array<FloatArray>, resEmbedding: FloatArray): FloatArray {
+            val result = FloatArray(embeddings.size)
+            embeddings.forEachIndexed { index, embedding ->
+                result[index] = embedding.zip(resEmbedding).fold(0f) { res, cur ->
+                    res + cur.first * cur.second
+                }
+            }
+
+            return result
+        }
+
+        fun topKIndices(list: FloatArray, k: Int): List<Int> {
             val indices = List(list.size) { index -> index }
             return indices.sortedByDescending { list[it] }.take(k)
         }

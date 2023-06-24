@@ -11,10 +11,6 @@ import com.example.emojisemanticsearch.utils.toBean
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.kotlinx.multik.api.mk
-import org.jetbrains.kotlinx.multik.api.ndarray
-import org.jetbrains.kotlinx.multik.api.zeros
-import org.jetbrains.kotlinx.multik.ndarray.data.set
 import java.util.zip.GZIPInputStream
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
@@ -49,7 +45,7 @@ class AppInitializer : Initializer<Unit> {
                             }
 
                             emojiData.add(EmojiEntity(emojiJsonEntity.emoji, emojiJsonEntity.message))
-                            emojiEmbeddings[index] = mk.ndarray(emojiJsonEntity.embed)
+                            emojiEmbeddings[index] = emojiJsonEntity.embed
                         }
                     }
                 }
@@ -62,7 +58,7 @@ class AppInitializer : Initializer<Unit> {
         const val EMOJI_EMBEDDING_SIZE = 3753
         const val EMBEDDING_LENGTH_PER_EMOJI = 1536
         // size: 3753, 1536
-        val emojiEmbeddings = mk.zeros<Float>(EMOJI_EMBEDDING_SIZE, EMBEDDING_LENGTH_PER_EMOJI)
+        val emojiEmbeddings = Array(EMOJI_EMBEDDING_SIZE) { FloatArray(EMBEDDING_LENGTH_PER_EMOJI) }
         val emojiData: MutableList<EmojiEntity> = mutableListOf()
     }
 }
