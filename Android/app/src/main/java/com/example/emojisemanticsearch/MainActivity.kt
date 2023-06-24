@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.d(TAG, "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.size}")
+        Log.d(TAG, "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.shape}")
         setContent {
             EmojiSemanticSearchTheme {
                 // A surface container using the 'background' color from the theme
@@ -189,7 +189,7 @@ fun SearchEmojiField(
         keyboardActions = KeyboardActions(onSearch = {
             Log.d(
                 "MainActivity",
-                "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.size}"
+                "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.shape}"
             )
             onSearch(searchText.text)
             controller?.hide()
