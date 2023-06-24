@@ -225,11 +225,3 @@ fun LoadingPage(modifier: Modifier = Modifier) {
         CircularProgressIndicator()
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun SearchEmojiPreview() {
-    EmojiSemanticSearchTheme {
-        SearchEmojiField(modifier = Modifier.fillMaxWidth())
-    }
-}
