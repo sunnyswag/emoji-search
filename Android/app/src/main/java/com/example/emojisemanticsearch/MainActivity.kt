@@ -44,7 +44,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.emojisemanticsearch.entity.EmojiEntity
 import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiData
@@ -54,6 +53,7 @@ import com.example.emojisemanticsearch.utils.saveToClipboard
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -68,6 +68,8 @@ class MainActivity : ComponentActivity() {
                     Column(modifier = Modifier.fillMaxSize()) {
                         val viewModel: MainViewModel = getViewModel()
                         val uiState by viewModel.uiState.collectAsState()
+                        val controller = LocalSoftwareKeyboardController.current
+
                         LaunchedEffect(key1 = true) {
                             viewModel.initState()
                         }
@@ -75,6 +77,7 @@ class MainActivity : ComponentActivity() {
                         SearchEmojiField(modifier = Modifier.fillMaxWidth(),
                             onSearch = {
                                 viewModel.searchEmojis(it)
+                                controller?.hide()
                             }, onClickDeleteAll = {
                                 viewModel.initState()
                             })
@@ -85,15 +88,13 @@ class MainActivity : ComponentActivity() {
                             }
                             is UiState.Success -> {
                                 val state = uiState as UiState.Success
-                                DisplayEmoji(
-                                    state.data,
-                                    modifier = modifier
-                                )
+                                DisplayEmoji(state.data, modifier = modifier)
                             }
                             is UiState.Error -> {
                                 val state = uiState as UiState.Error
                                 ErrorPage(modifier, state.message) {
                                     viewModel.reSearchEmojis()
+                                    controller?.hide()
                                 }
                             }
                             is UiState.Default -> {
@@ -144,9 +145,7 @@ fun EmojiItem(emojiEntity: EmojiEntity) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class,
-    ExperimentalAnimationApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun SearchEmojiField(
     modifier: Modifier,
@@ -154,7 +153,6 @@ fun SearchEmojiField(
     onClickDeleteAll: () -> Unit = {}
 ) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
-    val controller = LocalSoftwareKeyboardController.current
 
     TextField(value = searchText,
         placeholder = { Text("Find the most relevant emojis") },
@@ -192,7 +190,6 @@ fun SearchEmojiField(
                 "emojiData size: ${emojiData.size}, emojiEmbeddings size: ${emojiEmbeddings.shape}"
             )
             onSearch(searchText.text)
-            controller?.hide()
         }))
 }
 
