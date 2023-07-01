@@ -8,7 +8,7 @@ class MultiStreamProcessor : IProcessor {
 
     override val processorType = ProcessorType.PROCESS_EACH_LINE_WITH_CHANNEL_AND_MULTI_STREAM
 
-    override fun process(context: Context) {
+    override suspend fun process(context: Context) {
         TODO("Not yet implemented")
     }
 }

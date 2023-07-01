@@ -6,5 +6,5 @@ interface IProcessor {
 
     val processorType: ProcessorType
 
-    fun process(context: Context)
+    suspend fun process(context: Context)
 }
