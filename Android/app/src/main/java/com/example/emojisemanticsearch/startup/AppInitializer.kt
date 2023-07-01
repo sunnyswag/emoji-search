@@ -5,7 +5,7 @@ import android.content.Context
 import android.util.Log
 import androidx.startup.Initializer
 import com.example.emojisemanticsearch.R
-import com.example.emojisemanticsearch.entity.EmojiEntity
+import com.example.emojisemanticsearch.entity.EmojiInfoEntity
 import com.example.emojisemanticsearch.entity.EmojiJsonEntity
 import com.example.emojisemanticsearch.utils.toBean
 import kotlinx.coroutines.CoroutineScope
@@ -62,7 +62,7 @@ class AppInitializer : Initializer<Unit> {
         for (data in channel) {
             data.toBean<EmojiJsonEntity>()?.let { emojiJsonEntity ->
                 emojiData.add(
-                    EmojiEntity(
+                    EmojiInfoEntity(
                         emojiJsonEntity.emoji,
                         emojiJsonEntity.message
                     )
@@ -79,6 +79,6 @@ class AppInitializer : Initializer<Unit> {
         const val EMBEDDING_LENGTH_PER_EMOJI = 1536
         // size: 3753, 1536
         val emojiEmbeddings = mk.zeros<Float>(EMOJI_EMBEDDING_SIZE, EMBEDDING_LENGTH_PER_EMOJI)
-        val emojiData: MutableList<EmojiEntity> = mutableListOf()
+        val emojiData: MutableList<EmojiInfoEntity> = mutableListOf()
     }
 }

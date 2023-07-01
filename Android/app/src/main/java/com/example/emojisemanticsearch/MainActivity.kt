@@ -45,7 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.example.emojisemanticsearch.entity.EmojiEntity
+import com.example.emojisemanticsearch.entity.EmojiInfoEntity
 import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiData
 import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiEmbeddings
 import com.example.emojisemanticsearch.ui.theme.EmojiSemanticSearchTheme
@@ -113,7 +113,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun DisplayEmoji(emojiData: List<EmojiEntity>, modifier: Modifier = Modifier) {
+fun DisplayEmoji(emojiData: List<EmojiInfoEntity>, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier.padding(horizontal = 10.dp)) {
         items(emojiData.size) { index ->
             EmojiItem(emojiData[index])
@@ -122,24 +122,24 @@ fun DisplayEmoji(emojiData: List<EmojiEntity>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun EmojiItem(emojiEntity: EmojiEntity) {
+fun EmojiItem(emojiInfoEntity: EmojiInfoEntity) {
     val context = LocalContext.current
     Row(modifier = Modifier
         .fillMaxWidth()
         .clickable {
-            saveToClipboard(context, emojiEntity.emoji)
+            saveToClipboard(context, emojiInfoEntity.emoji)
             Toast
                 .makeText(
-                    context, "Copy ${emojiEntity.emoji} to clipboard", Toast.LENGTH_SHORT
+                    context, "Copy ${emojiInfoEntity.emoji} to clipboard", Toast.LENGTH_SHORT
                 )
                 .show()
         }) {
         Text(
-            text = emojiEntity.emoji,
+            text = emojiInfoEntity.emoji,
             modifier = Modifier.padding(10.dp)
         )
         Text(
-            text = emojiEntity.message,
+            text = emojiInfoEntity.message,
             modifier = Modifier.padding(10.dp)
         )
     }

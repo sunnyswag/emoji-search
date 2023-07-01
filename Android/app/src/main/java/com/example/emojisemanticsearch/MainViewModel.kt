@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.emojisemanticsearch.entity.EmojiEntity
+import com.example.emojisemanticsearch.entity.EmojiInfoEntity
 import com.example.emojisemanticsearch.network.EmbeddingRepository
 import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiData
 import kotlinx.coroutines.Dispatchers
@@ -59,7 +59,7 @@ val viewModelModule = module {
 
 sealed class UiState {
     object Loading: UiState()
-    data class Success(val data: List<EmojiEntity>): UiState()
+    data class Success(val data: List<EmojiInfoEntity>): UiState()
     data class Error(@StringRes val message: Int): UiState()
     object Default: UiState()
 }
