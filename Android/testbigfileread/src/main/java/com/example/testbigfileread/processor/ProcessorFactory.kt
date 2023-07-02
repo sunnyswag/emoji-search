@@ -15,7 +15,7 @@ object ProcessorFactory {
         MultiStreamProcessor()
     )
 
-    fun doProcess(context: Context, processorType: ProcessorType) {
+    suspend fun doProcess(context: Context, processorType: ProcessorType) {
         processors.find { it.processorType == processorType }?.process(context)
             ?: throw ProcessorNotFoundException("the $processorType processor not support!")
     }

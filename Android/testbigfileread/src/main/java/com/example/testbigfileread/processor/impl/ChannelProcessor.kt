@@ -11,20 +11,21 @@ import com.example.testbigfileread.processor.ProcessorType
 import com.example.testbigfileread.utils.toBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
 import org.jetbrains.kotlinx.multik.ndarray.data.set
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.GZIPInputStream
 
 class ChannelProcessor : IProcessor {
 
-    override val processorType = ProcessorType.PROCESS_EACH_LINE_WITH_CHANNEL
+    override val processorType = ProcessorType.EACH_LINE_WITH_CHANNEL_PROCESSOR
 
-    override suspend fun process(context: Context) = coroutineScope {
+    override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
         val channel = Channel<String>()
-        var index = 0
+        val index = AtomicInteger(0)
 
         launch(Dispatchers.IO) {
             context.resources.openRawResource(R.raw.emoji_embeddings).use { inputStream ->
@@ -47,8 +48,7 @@ class ChannelProcessor : IProcessor {
                         emojiJsonEntity.message
                     )
                 )
-                emojiEmbeddings[index] = mk.ndarray(emojiJsonEntity.embed)
-                index++
+                emojiEmbeddings[index.getAndIncrement()] = mk.ndarray(emojiJsonEntity.embed)
             }
         }
     }

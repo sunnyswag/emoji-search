@@ -9,7 +9,9 @@ import com.example.testbigfileread.entity.EmojiJsonEntity
 import com.example.testbigfileread.processor.IProcessor
 import com.example.testbigfileread.processor.ProcessorType
 import com.example.testbigfileread.utils.toBean
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
 import org.jetbrains.kotlinx.multik.ndarray.data.set
@@ -17,9 +19,9 @@ import java.util.zip.GZIPInputStream
 
 class EachLineProcessor : IProcessor {
 
-    override val processorType = ProcessorType.PROCESS_EACH_LINE
+    override val processorType = ProcessorType.EACH_LINE_PROCESSOR
 
-    override suspend fun process(context: Context) = coroutineScope {
+    override suspend fun process(context: Context) = withContext(Dispatchers.IO) {
         context.resources.openRawResource(R.raw.emoji_embeddings).use { inputStream ->
             GZIPInputStream(inputStream).bufferedReader().useLines { lines ->
                 lines.forEachIndexed { index, line ->
