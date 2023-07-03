@@ -26,16 +26,13 @@ class MainViewModel: ViewModel() {
         viewModelScope.launch {
             measureTime {
                 ProcessorFactory.doProcess(context, ProcessorType.DEFAULT_PROCESSOR)
-            }.also {
-                if (emojiInfoData.size != EMOJI_EMBEDDING_SIZE ||
-                    (emojiEmbeddings.shape[0] != EMOJI_EMBEDDING_SIZE
-                            && emojiEmbeddings.shape[1] != EMBEDDING_LENGTH_PER_EMOJI)) {
-                    throw IllegalStateException("the size of emojiInfoData or emojiEmbeddings is not correct," +
-                            "emojiInfoData.size: ${emojiInfoData.size}, " +
-                            "emojiEmbeddings.shape: ${emojiEmbeddings.shape[0]}、${emojiEmbeddings.shape[1]}}")
+            }.also { duration ->
+                if (emojiInfoData.size != EMOJI_EMBEDDING_SIZE) {
+                    throw IllegalStateException("the size of emojiInfoData is not correct, " +
+                            "emojiInfoData.size: ${emojiInfoData.size}")
                 }
-                _timeSpend.value = it
-                Log.d(TAG, "processInitialEmojiData time: $it")
+                _timeSpend.value = duration
+                Log.d(TAG, "processInitialEmojiData time: $duration")
             }
         }
     }
