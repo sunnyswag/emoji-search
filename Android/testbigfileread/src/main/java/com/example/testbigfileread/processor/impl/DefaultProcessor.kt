@@ -25,12 +25,8 @@ class DefaultProcessor : IProcessor {
             GZIPInputStream(inputStream).bufferedReader().use { bufferedReader ->
                 bufferedReader.readLines().forEachIndexed { index, line ->
                     line.toBean<EmojiJsonEntity>()?.let { emojiJsonEntity ->
-                        emojiInfoData.add(
-                            EmojiInfoEntity(
-                                emojiJsonEntity.emoji,
-                                emojiJsonEntity.message
-                            )
-                        )
+                        emojiInfoData[index].emoji = emojiJsonEntity.emoji
+                        emojiInfoData[index].message = emojiJsonEntity.message
                         emojiEmbeddings[index] = mk.ndarray(emojiJsonEntity.embed)
                     }
                 }

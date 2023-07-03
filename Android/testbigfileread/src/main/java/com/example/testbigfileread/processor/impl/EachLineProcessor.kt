@@ -3,6 +3,7 @@ package com.example.testbigfileread.processor.impl
 import android.content.Context
 import com.example.testbigfileread.MainViewModel
 import com.example.testbigfileread.MainViewModel.Companion.emojiEmbeddings
+import com.example.testbigfileread.MainViewModel.Companion.emojiInfoData
 import com.example.testbigfileread.R
 import com.example.testbigfileread.entity.EmojiInfoEntity
 import com.example.testbigfileread.entity.EmojiJsonEntity
@@ -26,12 +27,8 @@ class EachLineProcessor : IProcessor {
             GZIPInputStream(inputStream).bufferedReader().useLines { lines ->
                 lines.forEachIndexed { index, line ->
                     line.toBean<EmojiJsonEntity>()?.let { emojiJsonEntity ->
-                        MainViewModel.emojiInfoData.add(
-                            EmojiInfoEntity(
-                                emojiJsonEntity.emoji,
-                                emojiJsonEntity.message
-                            )
-                        )
+                        emojiInfoData[index].emoji = emojiJsonEntity.emoji
+                        emojiInfoData[index].message = emojiJsonEntity.message
                         emojiEmbeddings[index] = mk.ndarray(emojiJsonEntity.embed)
                     }
                 }

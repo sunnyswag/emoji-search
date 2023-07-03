@@ -4,7 +4,6 @@ import android.content.Context
 import com.example.testbigfileread.MainViewModel.Companion.emojiEmbeddings
 import com.example.testbigfileread.MainViewModel.Companion.emojiInfoData
 import com.example.testbigfileread.R
-import com.example.testbigfileread.entity.EmojiInfoEntity
 import com.example.testbigfileread.entity.EmojiJsonEntity
 import com.example.testbigfileread.processor.IProcessor
 import com.example.testbigfileread.processor.ProcessorType
@@ -42,13 +41,10 @@ class ChannelProcessor : IProcessor {
 
         for (data in channel) {
             data.toBean<EmojiJsonEntity>()?.let { emojiJsonEntity ->
-                emojiInfoData.add(
-                    EmojiInfoEntity(
-                        emojiJsonEntity.emoji,
-                        emojiJsonEntity.message
-                    )
-                )
-                emojiEmbeddings[index.getAndIncrement()] = mk.ndarray(emojiJsonEntity.embed)
+                val i = index.getAndIncrement()
+                emojiInfoData[i].emoji = emojiJsonEntity.emoji
+                emojiInfoData[i].message = emojiJsonEntity.message
+                emojiEmbeddings[i] = mk.ndarray(emojiJsonEntity.embed)
             }
         }
     }
