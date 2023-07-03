@@ -2,6 +2,7 @@ import gzip
 import json
 import os
 from typing import Dict, List
+import math
 
 import emoji
 import openai
@@ -24,12 +25,16 @@ def get_embeddings(inps: List[str], batch: int=1000, inp_type: str="doc") -> Lis
 	assert len(outputs) == len(inps)
 	return outputs
 
-def write_to_json(filename: str, data: List[Dict]):
-    assert filename.endswith(".json.gz")
-    with open(filename, "wb") as fp:
-        with gzip.GzipFile(fileobj=fp, mode="wb") as gz:
-            for x in tqdm.tqdm(data):
-                gz.write((json.dumps(x) + "\n").encode("utf-8"))
+def write_to_json(filename_base: str, data: List[Dict], num_files: int = 5):
+	chunk_size = math.ceil(len(data) / num_files)
+	chunks = [data[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
+
+	for i, chunk in enumerate(chunks):
+		filename = f"{filename_base}_{i}.gz"
+		with open(filename, "wb") as fp:
+			with gzip.GzipFile(fileobj=fp, mode="wb") as gz:
+				for x in tqdm.tqdm(chunk):
+					gz.write((json.dumps(x) + "\n").encode("utf-8"))
 
 def extract_emoji_messages() -> Dict[str, str]:
 	with open(os.path.join(EMOJI_DATA_DIR, "emoji-data.txt"), encoding="utf-8") as file:
@@ -71,7 +76,7 @@ def main():
 	]
 	print("first 2th info of emoji: ", info[:2], "\nlen info: ", len(info))
 
-	output_filename = os.path.join(EMOJI_DATA_DIR, "emoji_embeddings.gz")
+	output_filename = os.path.join(EMOJI_DATA_DIR, "emoji_embeddings")
 	write_to_json(output_filename, info)
 
 
