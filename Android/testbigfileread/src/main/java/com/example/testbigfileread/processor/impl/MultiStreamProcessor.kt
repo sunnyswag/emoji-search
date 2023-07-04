@@ -1,7 +1,6 @@
 package com.example.testbigfileread.processor.impl
 
 import android.content.Context
-import com.example.testbigfileread.MainViewModel.Companion.EMOJI_EMBEDDING_SIZE
 import com.example.testbigfileread.MainViewModel.Companion.emojiEmbeddings
 import com.example.testbigfileread.MainViewModel.Companion.emojiInfoData
 import com.example.testbigfileread.R
@@ -10,48 +9,51 @@ import com.example.testbigfileread.processor.IProcessor
 import com.example.testbigfileread.processor.ProcessorType
 import com.example.testbigfileread.utils.toBean
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flattenMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
 import org.jetbrains.kotlinx.multik.ndarray.data.set
-import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.GZIPInputStream
 
 class MultiStreamProcessor : IProcessor {
 
     override val processorType = ProcessorType.EACH_LINE_WITH_CHANNEL_AND_MULTI_STREAM_PROCESSOR
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
-        val indexes = List(STREAM_SIZE) { AtomicInteger(0) }
+        var index = 0
+        val mutex = Mutex()
 
-        val flows = List(STREAM_SIZE) { i ->
+        List(STREAM_SIZE) { i ->
             flow {
                 val resId = getEmbeddingResId(i)
                 context.resources.openRawResource(resId).use { inputStream ->
                     GZIPInputStream(inputStream).use { gzipInputStream ->
                         gzipInputStream.bufferedReader().useLines { lines ->
                             for (line in lines) {
-                                emit(Pair(i, line))
+                                emit(line)
                             }
                         }
                     }
                 }
             }.flowOn(Dispatchers.IO)
-        }
-
-        flows.asFlow()
+        }.asFlow()
             .flattenMerge(STREAM_SIZE)
-            .collect { (i, data) ->
+            .collect { data ->
                 data.toBean<EmojiJsonEntity>()?.let { emojiJsonEntity ->
-                    val index =
-                        indexes[i].getAndIncrement() + i * (EMOJI_EMBEDDING_SIZE / STREAM_SIZE)
-                    emojiInfoData[index].emoji = emojiJsonEntity.emoji
-                    emojiInfoData[index].message = emojiJsonEntity.message
-                    emojiEmbeddings[index] = mk.ndarray(emojiJsonEntity.embed)
+                    mutex.withLock {
+                        emojiInfoData[index].emoji = emojiJsonEntity.emoji
+                        emojiInfoData[index].message = emojiJsonEntity.message
+                        emojiEmbeddings[index] = mk.ndarray(emojiJsonEntity.embed)
+                        index++
+                    }
                 }
             }
     }
