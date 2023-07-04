@@ -25,7 +25,7 @@ class MainViewModel: ViewModel() {
     fun processInitialEmojiData(context: Context) {
         viewModelScope.launch {
             measureTime {
-                ProcessorFactory.doProcess(context, ProcessorType.EACH_LINE_WITH_CHANNEL_AND_MULTI_STREAM_PROCESSOR)
+                ProcessorFactory.doProcess(context, ProcessorType.EACH_LINE_PROCESSOR)
             }.also { duration ->
                 if (emojiInfoData.filterNot { it.emoji.isEmpty() }.size != EMOJI_EMBEDDING_SIZE) {
                     throw IllegalStateException("the size of emojiInfoData is not correct, " +

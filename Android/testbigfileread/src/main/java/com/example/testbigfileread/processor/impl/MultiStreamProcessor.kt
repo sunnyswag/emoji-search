@@ -10,8 +10,10 @@ import com.example.testbigfileread.processor.IProcessor
 import com.example.testbigfileread.processor.ProcessorType
 import com.example.testbigfileread.utils.toBean
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flattenMerge
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
@@ -24,35 +26,34 @@ class MultiStreamProcessor : IProcessor {
     override val processorType = ProcessorType.EACH_LINE_WITH_CHANNEL_AND_MULTI_STREAM_PROCESSOR
 
     override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
-        val channels = List(STREAM_SIZE) { Channel<String>() }
         val indexes = List(STREAM_SIZE) { AtomicInteger(0) }
 
-        channels.forEachIndexed { i, channel ->
-            launch(Dispatchers.IO) {
+        val flows = List(STREAM_SIZE) { i ->
+            flow {
                 val resId = getEmbeddingResId(i)
                 context.resources.openRawResource(resId).use { inputStream ->
                     GZIPInputStream(inputStream).use { gzipInputStream ->
                         gzipInputStream.bufferedReader().useLines { lines ->
                             for (line in lines) {
-                                channel.send(line)
+                                emit(Pair(i, line))
                             }
-                            channel.close()
                         }
                     }
                 }
-            }
+            }.flowOn(Dispatchers.IO)
         }
 
-        channels.forEachIndexed { i, channel ->
-            for (data in channel) {
+        flows.asFlow()
+            .flattenMerge(STREAM_SIZE)
+            .collect { (i, data) ->
                 data.toBean<EmojiJsonEntity>()?.let { emojiJsonEntity ->
-                    val index = indexes[i].getAndIncrement() + i * (EMOJI_EMBEDDING_SIZE / STREAM_SIZE)
+                    val index =
+                        indexes[i].getAndIncrement() + i * (EMOJI_EMBEDDING_SIZE / STREAM_SIZE)
                     emojiInfoData[index].emoji = emojiJsonEntity.emoji
                     emojiInfoData[index].message = emojiJsonEntity.message
                     emojiEmbeddings[index] = mk.ndarray(emojiJsonEntity.embed)
                 }
             }
-        }
     }
 
     private fun getEmbeddingResId(i: Int) = when (i) {
