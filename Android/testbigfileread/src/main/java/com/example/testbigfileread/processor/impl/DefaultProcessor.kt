@@ -7,7 +7,7 @@ import com.example.testbigfileread.R
 import com.example.testbigfileread.entity.EmojiJsonEntity
 import com.example.testbigfileread.processor.IProcessor
 import com.example.testbigfileread.processor.ProcessorType
-import com.example.testbigfileread.utils.toBean
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.kotlinx.multik.api.mk
@@ -17,17 +17,18 @@ import java.util.zip.GZIPInputStream
 
 class DefaultProcessor : IProcessor {
 
+    private val gson = Gson()
+
     override val processorType = ProcessorType.DEFAULT_PROCESSOR
 
     override suspend fun process(context: Context) = withContext(Dispatchers.IO) {
         context.resources.openRawResource(R.raw.emoji_embeddings).use { inputStream ->
             GZIPInputStream(inputStream).bufferedReader().use { bufferedReader ->
                 bufferedReader.readLines().forEachIndexed { index, line ->
-                    line.toBean<EmojiJsonEntity>()?.let { emojiJsonEntity ->
-                        emojiInfoData[index].emoji = emojiJsonEntity.emoji
-                        emojiInfoData[index].message = emojiJsonEntity.message
-                        emojiEmbeddings[index] = mk.ndarray(emojiJsonEntity.embed)
-                    }
+                    val entity = gson.fromJson(line, EmojiJsonEntity::class.java)
+                    emojiInfoData[index].emoji = entity.emoji
+                    emojiInfoData[index].message = entity.message
+                    emojiEmbeddings[index] = mk.ndarray(entity.embed)
                 }
             }
         }

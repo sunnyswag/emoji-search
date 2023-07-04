@@ -7,7 +7,7 @@ import com.example.testbigfileread.R
 import com.example.testbigfileread.entity.EmojiJsonEntity
 import com.example.testbigfileread.processor.IProcessor
 import com.example.testbigfileread.processor.ProcessorType
-import com.example.testbigfileread.utils.toBean
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.asFlow
@@ -23,6 +23,8 @@ import org.jetbrains.kotlinx.multik.ndarray.data.set
 import java.util.zip.GZIPInputStream
 
 class MultiStreamProcessor : IProcessor {
+
+    private val gson = Gson()
 
     override val processorType = ProcessorType.EACH_LINE_WITH_CHANNEL_AND_MULTI_STREAM_PROCESSOR
 
@@ -47,13 +49,12 @@ class MultiStreamProcessor : IProcessor {
         }.asFlow()
             .flattenMerge(STREAM_SIZE)
             .collect { data ->
-                data.toBean<EmojiJsonEntity>()?.let { emojiJsonEntity ->
-                    mutex.withLock {
-                        emojiInfoData[index].emoji = emojiJsonEntity.emoji
-                        emojiInfoData[index].message = emojiJsonEntity.message
-                        emojiEmbeddings[index] = mk.ndarray(emojiJsonEntity.embed)
-                        index++
-                    }
+                val entity = gson.fromJson(data, EmojiJsonEntity::class.java)
+                mutex.withLock {
+                    emojiInfoData[index].emoji = entity.emoji
+                    emojiInfoData[index].message = entity.message
+                    emojiEmbeddings[index] = mk.ndarray(entity.embed)
+                    index++
                 }
             }
     }

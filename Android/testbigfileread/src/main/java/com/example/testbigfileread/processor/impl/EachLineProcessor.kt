@@ -7,7 +7,7 @@ import com.example.testbigfileread.R
 import com.example.testbigfileread.entity.EmojiJsonEntity
 import com.example.testbigfileread.processor.IProcessor
 import com.example.testbigfileread.processor.ProcessorType
-import com.example.testbigfileread.utils.toBean
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.GZIPInputStream
 
 class EachLineProcessor : IProcessor {
+
+    private val gson = Gson()
 
     override val processorType = ProcessorType.EACH_LINE_PROCESSOR
 
@@ -37,12 +39,11 @@ class EachLineProcessor : IProcessor {
             }
         }.flowOn(Dispatchers.IO)
             .collect {
-                it.toBean<EmojiJsonEntity>()?.let { emojiJsonEntity ->
-                    val i = index.getAndIncrement()
-                    emojiInfoData[i].emoji = emojiJsonEntity.emoji
-                    emojiInfoData[i].message = emojiJsonEntity.message
-                    emojiEmbeddings[i] = mk.ndarray(emojiJsonEntity.embed)
-                }
+                val entity = gson.fromJson(it, EmojiJsonEntity::class.java)
+                val i = index.getAndIncrement()
+                emojiInfoData[i].emoji = entity.emoji
+                emojiInfoData[i].message = entity.message
+                emojiEmbeddings[i] = mk.ndarray(entity.embed)
             }
     }
 }
