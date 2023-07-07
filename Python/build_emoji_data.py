@@ -7,13 +7,16 @@ import math
 import emoji
 import openai
 import tqdm
+import emoji_data.proto_emoji_embeddings.emoji_embedding_pb2 as pb2
 
 openai.api_key = os.environ["OPENAI_API_KEY"]
 openai.api_base = "https://api.openai.com/v1"
 EMBEDDING_MODEL = "text-embedding-ada-002"
 
-SERVER_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-EMOJI_DATA_DIR = os.path.join(SERVER_DIR, "Python/emoji_data")
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+EMOJI_DATA_DIR = os.path.join(ROOT_DIR, "Python", "emoji_data")
+JSON_DATA_DIR = os.path.join(EMOJI_DATA_DIR, "json_emoji_embeddings")
+PROTO_DATA_DIR = os.path.join(EMOJI_DATA_DIR, "proto_emoji_embeddings")
 
 def get_embeddings(inps: List[str], batch: int=1000, inp_type: str="doc") -> List[List[float]]:
 	i = 0
@@ -25,7 +28,7 @@ def get_embeddings(inps: List[str], batch: int=1000, inp_type: str="doc") -> Lis
 	assert len(outputs) == len(inps)
 	return outputs
 
-def write_to_json(filename_base: str, data: List[Dict], num_files: int = 5):
+def write_to_json_with_chunks(filename_base: str, data: List[Dict], num_files: int = 5):
 	chunk_size = math.ceil(len(data) / num_files)
 	chunks = [data[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
 
@@ -35,6 +38,27 @@ def write_to_json(filename_base: str, data: List[Dict], num_files: int = 5):
 			with gzip.GzipFile(fileobj=fp, mode="wb") as gz:
 				for x in tqdm.tqdm(chunk):
 					gz.write((json.dumps(x) + "\n").encode("utf-8"))
+
+def write_to_json(filename: str, data: List[Dict]):
+    with open(f"{filename}.gz", "wb") as fp:
+        with gzip.GzipFile(fileobj=fp, mode="wb") as gz:
+            for x in tqdm.tqdm(data):
+                gz.write((json.dumps(x) + "\n").encode("utf-8"))
+
+def write_to_proto(filename: str, data: List[Dict]):
+	output_messages = []
+
+	for item in data:
+		msg = pb2.EmojiEmbedding()
+		msg.emoji = item["emoji"]
+		msg.message = item["message"]
+		msg.embed.extend(item["embed"])
+		output_messages.append(msg.SerializeToString())
+
+	with gzip.open(f"{filename}.gz", "wb") as f:
+		for message in output_messages:
+			f.write(len(message).to_bytes(4, 'big'))
+			f.write(message)
 
 def extract_emoji_messages() -> Dict[str, str]:
 	with open(os.path.join(EMOJI_DATA_DIR, "emoji-data.txt"), encoding="utf-8") as file:
@@ -76,8 +100,12 @@ def main():
 	]
 	print("first 2th info of emoji: ", info[:2], "\nlen info: ", len(info))
 
-	output_filename = os.path.join(EMOJI_DATA_DIR, "emoji_embeddings")
-	write_to_json(output_filename, info)
+	json_output_filename = os.path.join(JSON_DATA_DIR, "emoji_embeddings")
+	write_to_json(json_output_filename, info)
+	write_to_json_with_chunks(json_output_filename, info)
+
+	proto_output_filename = os.path.join(PROTO_DATA_DIR, "emoji_embeddings")
+	write_to_proto(proto_output_filename, info)
 
 
 if __name__ == "__main__":

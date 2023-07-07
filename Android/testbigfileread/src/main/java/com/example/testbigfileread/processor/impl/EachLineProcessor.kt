@@ -39,8 +39,8 @@ class EachLineProcessor : IProcessor {
             }
         }.flowOn(Dispatchers.IO)
             .collect {
-                val entity = gson.fromJson(it, EmojiJsonEntity::class.java)
                 val i = index.getAndIncrement()
+                val entity = gson.fromJson(it, EmojiJsonEntity::class.java)
                 emojiInfoData[i].emoji = entity.emoji
                 emojiInfoData[i].message = entity.message
                 emojiEmbeddings[i] = mk.ndarray(entity.embed)
