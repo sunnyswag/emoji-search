@@ -28,17 +28,6 @@ def get_embeddings(inps: List[str], batch: int=1000, inp_type: str="doc") -> Lis
 	assert len(outputs) == len(inps)
 	return outputs
 
-def write_to_json_with_chunks(filename_base: str, data: List[Dict], num_files: int = 5):
-	chunk_size = math.ceil(len(data) / num_files)
-	chunks = [data[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
-
-	for i, chunk in enumerate(chunks):
-		filename = f"{filename_base}_{i}.gz"
-		with open(filename, "wb") as fp:
-			with gzip.GzipFile(fileobj=fp, mode="wb") as gz:
-				for x in tqdm.tqdm(chunk):
-					gz.write((json.dumps(x) + "\n").encode("utf-8"))
-
 def write_to_json(filename: str, data: List[Dict]):
     with open(f"{filename}.gz", "wb") as fp:
         with gzip.GzipFile(fileobj=fp, mode="wb") as gz:
@@ -59,6 +48,21 @@ def write_to_proto(filename: str, data: List[Dict]):
 		for message in output_messages:
 			f.write(len(message).to_bytes(4, 'big'))
 			f.write(message)
+
+def getchunks(data: List[Dict], num_files: int = 5):
+	chunk_size = math.ceil(len(data) / num_files)
+	chunks = [data[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
+	return chunks
+
+def write_to_json_with_chunks(filename_base: str, chunks: List[List[Dict]]):
+	for i, chunk in enumerate(chunks):
+		filename = f"{filename_base}_{i}"
+		write_to_json(filename, chunk)
+
+def write_to_proto_with_chunks(filename_base: str, chunks: List[List[Dict]]):
+	for i, chunk in enumerate(chunks):
+		filename = f"{filename_base}_{i}"
+		write_to_proto(filename, chunk)
 
 def extract_emoji_messages() -> Dict[str, str]:
 	with open(os.path.join(EMOJI_DATA_DIR, "emoji-data.txt"), encoding="utf-8") as file:
@@ -100,12 +104,13 @@ def main():
 	]
 	print("first 2th info of emoji: ", info[:2], "\nlen info: ", len(info))
 
-	json_output_filename = os.path.join(JSON_DATA_DIR, "emoji_embeddings")
+	json_output_filename = os.path.join(JSON_DATA_DIR, "emoji_embeddings_json")
 	write_to_json(json_output_filename, info)
-	write_to_json_with_chunks(json_output_filename, info)
+	write_to_json_with_chunks(json_output_filename, getchunks(info))
 
-	proto_output_filename = os.path.join(PROTO_DATA_DIR, "emoji_embeddings")
+	proto_output_filename = os.path.join(PROTO_DATA_DIR, "emoji_embeddings_proto")
 	write_to_proto(proto_output_filename, info)
+	write_to_proto_with_chunks(proto_output_filename, getchunks(info))
 
 
 if __name__ == "__main__":
