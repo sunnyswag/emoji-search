@@ -28,7 +28,7 @@ class EachLineProcessor : IProcessor {
         val index = AtomicInteger(0)
 
         flow {
-            context.resources.openRawResource(R.raw.emoji_embeddings).use { inputStream ->
+            context.resources.openRawResource(R.raw.emoji_embeddings_json).use { inputStream ->
                 GZIPInputStream(inputStream).use { gzipInputStream ->
                     gzipInputStream.bufferedReader().useLines { lines ->
                         for (line in lines) {

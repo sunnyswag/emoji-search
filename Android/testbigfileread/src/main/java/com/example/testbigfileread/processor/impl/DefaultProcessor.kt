@@ -22,7 +22,7 @@ class DefaultProcessor : IProcessor {
     override val processorType = ProcessorType.DEFAULT_PROCESSOR
 
     override suspend fun process(context: Context) = withContext(Dispatchers.IO) {
-        context.resources.openRawResource(R.raw.emoji_embeddings).use { inputStream ->
+        context.resources.openRawResource(R.raw.emoji_embeddings_json).use { inputStream ->
             GZIPInputStream(inputStream).bufferedReader().use { bufferedReader ->
                 bufferedReader.readLines().forEachIndexed { index, line ->
                     val entity = gson.fromJson(line, EmojiJsonEntity::class.java)

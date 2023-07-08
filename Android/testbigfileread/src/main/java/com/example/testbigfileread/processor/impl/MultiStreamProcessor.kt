@@ -60,11 +60,11 @@ class MultiStreamProcessor : IProcessor {
     }
 
     private fun getEmbeddingResId(i: Int) = when (i) {
-        0 -> R.raw.emoji_embeddings_0
-        1 -> R.raw.emoji_embeddings_1
-        2 -> R.raw.emoji_embeddings_2
-        3 -> R.raw.emoji_embeddings_3
-        4 -> R.raw.emoji_embeddings_4
+        0 -> R.raw.emoji_embeddings_json_0
+        1 -> R.raw.emoji_embeddings_json_1
+        2 -> R.raw.emoji_embeddings_json_2
+        3 -> R.raw.emoji_embeddings_json_3
+        4 -> R.raw.emoji_embeddings_json_4
         else -> throw IllegalArgumentException("Invalid index: $i")
     }
 
