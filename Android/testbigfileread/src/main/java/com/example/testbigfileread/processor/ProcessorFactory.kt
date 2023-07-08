@@ -4,13 +4,15 @@ import android.content.Context
 import com.example.testbigfileread.processor.impl.EachLineProcessor
 import com.example.testbigfileread.processor.impl.DefaultProcessor
 import com.example.testbigfileread.processor.impl.MultiStreamProcessor
+import com.example.testbigfileread.processor.impl.ProtobufProcessor
 
 object ProcessorFactory {
 
     private val processors = listOf(
         DefaultProcessor(),
         EachLineProcessor(),
-        MultiStreamProcessor()
+        MultiStreamProcessor(),
+        ProtobufProcessor()
     )
 
     suspend fun doProcess(context: Context, processorType: ProcessorType) {
