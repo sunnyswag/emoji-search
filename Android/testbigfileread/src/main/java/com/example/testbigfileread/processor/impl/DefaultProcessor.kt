@@ -19,7 +19,7 @@ class DefaultProcessor : IProcessor {
 
     private val gson = Gson()
 
-    override val processorType = ProcessorType.DEFAULT_PROCESSOR
+    override val processorType = ProcessorType.DEFAULT_JSON_PROCESSOR
 
     override suspend fun process(context: Context) = withContext(Dispatchers.IO) {
         context.resources.openRawResource(R.raw.emoji_embeddings_json).use { inputStream ->

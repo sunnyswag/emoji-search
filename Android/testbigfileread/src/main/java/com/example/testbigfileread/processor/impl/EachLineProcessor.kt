@@ -22,7 +22,7 @@ class EachLineProcessor : IProcessor {
 
     private val gson = Gson()
 
-    override val processorType = ProcessorType.EACH_LINE_PROCESSOR
+    override val processorType = ProcessorType.JSON_EACH_LINE_PROCESSOR
 
     override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
         val index = AtomicInteger(0)

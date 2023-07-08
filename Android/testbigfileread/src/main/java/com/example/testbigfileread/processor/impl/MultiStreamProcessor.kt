@@ -26,7 +26,7 @@ class MultiStreamProcessor : IProcessor {
 
     private val gson = Gson()
 
-    override val processorType = ProcessorType.EACH_LINE_WITH_CHANNEL_AND_MULTI_STREAM_PROCESSOR
+    override val processorType = ProcessorType.JSON_EACH_LINE_MULTI_STREAM_PROCESSOR
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
