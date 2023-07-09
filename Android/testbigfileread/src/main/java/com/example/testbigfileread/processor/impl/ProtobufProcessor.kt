@@ -9,6 +9,9 @@ import com.example.testbigfileread.R
 import com.example.testbigfileread.processor.IProcessor
 import com.example.testbigfileread.processor.ProcessorType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
@@ -17,17 +20,19 @@ import org.jetbrains.kotlinx.multik.api.ndarray
 import org.jetbrains.kotlinx.multik.ndarray.data.set
 import java.io.DataInputStream
 import java.io.EOFException
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.GZIPInputStream
 
 class ProtobufProcessor: IProcessor {
 
-    private var index = 0
+    private var index = AtomicInteger(0)
     override val processorType = ProcessorType.PROTOBUF_PROCESSOR
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
         flow {
             context.resources.openRawResource(R.raw.emoji_embeddings_proto).use { inputStream ->
-                GZIPInputStream(inputStream).use { gzipInputStream ->
+                GZIPInputStream(inputStream).buffered().use { gzipInputStream ->
                     DataInputStream(gzipInputStream).use { dataInputStream ->
                         try {
                             while (true) {
@@ -44,17 +49,18 @@ class ProtobufProcessor: IProcessor {
                 }
             }
         }.flowOn(Dispatchers.IO)
-            .collect {
-                readEmojiData(it)
-            }
+            .buffer()
+            .flatMapMerge { byteArray ->
+                flow { emit(readEmojiData(byteArray)) }
+            }.collect {}
     }
 
     private fun readEmojiData(byteArray: ByteArray) {
         val entity = EmojiEmbeddingOuterClass.EmojiEmbedding.parseFrom(byteArray)
-        emojiInfoData[index].emoji = entity.emoji
-        emojiInfoData[index].message = entity.message
-        emojiEmbeddings[index] = mk.ndarray(entity.embedList)
-        index++
+        val currentIdx = index.getAndIncrement()
+        emojiInfoData[currentIdx].emoji = entity.emoji
+        emojiInfoData[currentIdx].message = entity.message
+        emojiEmbeddings[currentIdx] = mk.ndarray(entity.embedList)
     }
 
     companion object {

@@ -10,33 +10,31 @@ import com.example.testbigfileread.processor.IProcessor
 import com.example.testbigfileread.processor.ProcessorType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.flattenMerge
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
 import org.jetbrains.kotlinx.multik.ndarray.data.set
 import java.io.DataInputStream
 import java.io.EOFException
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.GZIPInputStream
 
 class ProtobufMultiStreamProcessor : IProcessor {
 
-    private var index = 0
+    private var index = AtomicInteger(0)
     override val processorType = ProcessorType.PROTOBUF_MULTI_STREAM_PROCESSOR
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
-        val mutex = Mutex()
         List(STREAM_SIZE) { i ->
             flow {
                 val resId = getEmbeddingResId(i)
                 context.resources.openRawResource(resId).use { inputStream ->
-                    GZIPInputStream(inputStream).use { gzipInputStream ->
+                    GZIPInputStream(inputStream).buffered().use { gzipInputStream ->
                         DataInputStream(gzipInputStream).use { dataInputStream ->
                             try {
                                 while (true) {
@@ -53,21 +51,21 @@ class ProtobufMultiStreamProcessor : IProcessor {
                     }
                 }
             }.flowOn(Dispatchers.IO)
-        }.asFlow()
-            .flattenMerge(STREAM_SIZE)
-            .collect { data ->
-                mutex.withLock {
-                    readEmojiData(data)
+        }.forEach {
+            it.buffer()
+                .flatMapMerge {
+                    flow { emit(readEmojiData(it)) }
                 }
-            }
+                .collect {}
+        }
     }
 
     private fun readEmojiData(byteArray: ByteArray) {
         val entity = EmojiEmbeddingOuterClass.EmojiEmbedding.parseFrom(byteArray)
-        emojiInfoData[index].emoji = entity.emoji
-        emojiInfoData[index].message = entity.message
-        emojiEmbeddings[index] = mk.ndarray(entity.embedList)
-        index++
+        val currentIdx = index.getAndIncrement()
+        emojiInfoData[currentIdx].emoji = entity.emoji
+        emojiInfoData[currentIdx].message = entity.message
+        emojiEmbeddings[currentIdx] = mk.ndarray(entity.embedList)
     }
 
     private fun getEmbeddingResId(i: Int) = when (i) {
