@@ -1,6 +1,6 @@
 package com.example.emojisemanticsearch.entity
 
 data class EmojiInfoEntity(
-    val emoji: String,
-    val message: String
+    var emoji: String,
+    var message: String
 )

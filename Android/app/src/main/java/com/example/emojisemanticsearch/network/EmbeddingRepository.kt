@@ -5,7 +5,7 @@ import com.example.emojisemanticsearch.entity.EmbeddingRequest
 import com.example.emojisemanticsearch.entity.EmbeddingResponse
 import com.example.emojisemanticsearch.startup.AppInitializer.Companion.EMBEDDING_LENGTH_PER_EMOJI
 import com.example.emojisemanticsearch.startup.AppInitializer.Companion.EMOJI_EMBEDDING_SIZE
-import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiData
+import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiInfoData
 import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiEmbeddings
 import org.jetbrains.kotlinx.multik.api.linalg.dot
 import org.jetbrains.kotlinx.multik.api.mk
@@ -51,7 +51,7 @@ class EmbeddingRepository(private val openAIAPI: OpenAIAPI) {
         }
 
         fun getScaledTopK(topK: Int): Int {
-            val scale = min(1f, max(0.2f, emojiData.size / EMOJI_EMBEDDING_SIZE.toFloat()))
+            val scale = min(1f, max(0.2f, emojiInfoData.size / EMOJI_EMBEDDING_SIZE.toFloat()))
             return (topK * scale).toInt().also {
                 Log.d(TAG, "scaled topK: $it, topK: $topK, scale: $scale")
             }

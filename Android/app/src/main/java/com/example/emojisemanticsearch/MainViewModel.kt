@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.emojisemanticsearch.entity.EmojiInfoEntity
 import com.example.emojisemanticsearch.network.EmbeddingRepository
-import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiData
+import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiInfoData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -28,7 +28,7 @@ class MainViewModel(
             lastUserInput = userInput
             if (result.isSuccess) {
                 result.getOrNull()?.let { indexes ->
-                    _uiState.emit(UiState.Success(indexes.map { emojiData[it] }))
+                    _uiState.emit(UiState.Success(indexes.map { emojiInfoData[it] }))
                 } ?: kotlin.run {
                     _uiState.emit(UiState.Error(R.string.computation_error))
                     Log.e(TAG, "searchEmojis: computation error")
