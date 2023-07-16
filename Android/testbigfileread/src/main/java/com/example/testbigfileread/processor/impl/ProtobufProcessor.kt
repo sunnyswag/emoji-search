@@ -56,7 +56,7 @@ class ProtobufProcessor: IProcessor {
     }
 
     private fun readEmojiData(byteArray: ByteArray) {
-        val entity = EmojiEmbeddingOuterClass.EmojiEmbedding.parseFrom(byteArray)
+        val entity = EmojiEmbeddingOuterClass.EmojiEmbedding.parseFrom(byteArray)3
         val currentIdx = index.getAndIncrement()
         emojiInfoData[currentIdx].emoji = entity.emoji
         emojiInfoData[currentIdx].message = entity.message
