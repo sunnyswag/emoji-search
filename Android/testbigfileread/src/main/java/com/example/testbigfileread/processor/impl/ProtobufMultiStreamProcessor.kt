@@ -32,8 +32,8 @@ class ProtobufMultiStreamProcessor : IProcessor {
     override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
         List(STREAM_SIZE) { i ->
             flow {
-                val resId = getEmbeddingResId(i)
-                context.resources.openRawResource(resId).use { inputStream ->
+//                val resId = getEmbeddingResId(i)
+                context.resources.openRawResource(R.raw.emoji_embeddings_proto).use { inputStream ->
                     GZIPInputStream(inputStream).buffered().use { gzipInputStream ->
                         DataInputStream(gzipInputStream).use { dataInputStream ->
                             try {
@@ -68,14 +68,14 @@ class ProtobufMultiStreamProcessor : IProcessor {
         emojiEmbeddings[currentIdx] = mk.ndarray(entity.embedList)
     }
 
-    private fun getEmbeddingResId(i: Int) = when (i) {
-        0 -> R.raw.emoji_embeddings_proto_0
-        1 -> R.raw.emoji_embeddings_proto_1
-        2 -> R.raw.emoji_embeddings_proto_2
-        3 -> R.raw.emoji_embeddings_proto_3
-        4 -> R.raw.emoji_embeddings_proto_4
-        else -> throw IllegalArgumentException("Invalid index: $i")
-    }
+//    private fun getEmbeddingResId(i: Int) = when (i) {
+//        0 -> R.raw.emoji_embeddings_proto_0
+//        1 -> R.raw.emoji_embeddings_proto_1
+//        2 -> R.raw.emoji_embeddings_proto_2
+//        3 -> R.raw.emoji_embeddings_proto_3
+//        4 -> R.raw.emoji_embeddings_proto_4
+//        else -> throw IllegalArgumentException("Invalid index: $i")
+//    }
 
     companion object {
         private const val TAG = "ProtobufMultiStreamProcessor"

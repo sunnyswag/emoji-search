@@ -3,6 +3,7 @@ package com.example.testbigfileread.processor
 import android.content.Context
 import com.example.testbigfileread.processor.impl.EachLineProcessor
 import com.example.testbigfileread.processor.impl.DefaultProcessor
+import com.example.testbigfileread.processor.impl.JsonToProtoBufProcessor
 import com.example.testbigfileread.processor.impl.MultiStreamProcessor
 import com.example.testbigfileread.processor.impl.ProtobufMultiStreamProcessor
 import com.example.testbigfileread.processor.impl.ProtobufProcessor
@@ -14,7 +15,8 @@ object ProcessorFactory {
         EachLineProcessor(),
         MultiStreamProcessor(),
         ProtobufProcessor(),
-        ProtobufMultiStreamProcessor()
+        ProtobufMultiStreamProcessor(),
+        JsonToProtoBufProcessor()
     )
 
     suspend fun doProcess(context: Context, processorType: ProcessorType) {

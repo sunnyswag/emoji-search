@@ -2,7 +2,6 @@ package com.example.testbigfileread.processor.impl
 
 import EmojiEmbeddingOuterClass
 import android.content.Context
-import android.util.Log
 import com.example.testbigfileread.MainViewModel.Companion.emojiEmbeddings
 import com.example.testbigfileread.MainViewModel.Companion.emojiInfoData
 import com.example.testbigfileread.R
@@ -18,8 +17,6 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
 import org.jetbrains.kotlinx.multik.ndarray.data.set
-import java.io.DataInputStream
-import java.io.EOFException
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.GZIPInputStream
 
@@ -33,18 +30,10 @@ class ProtobufProcessor: IProcessor {
         flow {
             context.resources.openRawResource(R.raw.emoji_embeddings_proto).use { inputStream ->
                 GZIPInputStream(inputStream).buffered().use { gzipInputStream ->
-                    DataInputStream(gzipInputStream).use { dataInputStream ->
-                        try {
-                            while (true) {
-                                val length = dataInputStream.readInt() // read message length
-                                val byteArray = ByteArray(length)
-                                dataInputStream.readFully(byteArray) // read message content
-
-                                emit(byteArray)
-                            }
-                        } catch (e: EOFException) {
-                            Log.d(TAG, "process: EOFException, end of file.")
-                        }
+                    while (true) {
+                        EmojiEmbeddingOuterClass.EmojiEmbedding.parseDelimitedFrom(gzipInputStream)?.let {
+                            emit(it)
+                        } ?: break
                     }
                 }
             }
@@ -55,8 +44,7 @@ class ProtobufProcessor: IProcessor {
             }.collect {}
     }
 
-    private fun readEmojiData(byteArray: ByteArray) {
-        val entity = EmojiEmbeddingOuterClass.EmojiEmbedding.parseFrom(byteArray)3
+    private fun readEmojiData(entity: EmojiEmbeddingOuterClass.EmojiEmbedding) {
         val currentIdx = index.getAndIncrement()
         emojiInfoData[currentIdx].emoji = entity.emoji
         emojiInfoData[currentIdx].message = entity.message

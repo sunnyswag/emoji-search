@@ -25,11 +25,11 @@ class MainViewModel: ViewModel() {
     fun processInitialEmojiData(context: Context) {
         viewModelScope.launch {
             measureTime {
-                ProcessorFactory.doProcess(context, ProcessorType.PROTOBUF_MULTI_STREAM_PROCESSOR)
+                ProcessorFactory.doProcess(context, ProcessorType.PROTOBUF_PROCESSOR)
             }.also { duration ->
                 val emojiDataSize = emojiInfoData.filterNot { it.emoji.isEmpty() }.size
                 if (emojiDataSize != EMOJI_EMBEDDING_SIZE) {
-                    throw IllegalStateException("the size of emojiInfoData is not correct, " +
+                    Log.e(TAG, "the size of emojiInfoData is not correct, " +
                             "emojiInfoData.size: $emojiDataSize")
                 }
                 _timeSpend.value = duration
@@ -42,8 +42,7 @@ class MainViewModel: ViewModel() {
     companion object {
         private const val TAG = "MainViewModel"
         const val EMOJI_EMBEDDING_SIZE = 3753
-        // protobuf: 3072, json: 1536
-        private const val EMBEDDING_LENGTH_PER_EMOJI = 3072
+        private const val EMBEDDING_LENGTH_PER_EMOJI = 1536
 
         // size: 3753, 1536
         val emojiEmbeddings = mk.zeros<Float>(EMOJI_EMBEDDING_SIZE, EMBEDDING_LENGTH_PER_EMOJI)
