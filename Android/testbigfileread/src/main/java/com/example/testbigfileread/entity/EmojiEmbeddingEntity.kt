@@ -1,6 +1,7 @@
 package com.example.testbigfileread.entity
 
-data class EmojiJsonEntity(
+
+data class EmojiEmbeddingEntity(
     val emoji: String,
     val message: String,
     val embed: FloatArray
@@ -9,7 +10,7 @@ data class EmojiJsonEntity(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as EmojiJsonEntity
+        other as EmojiEmbeddingEntity
 
         if (emoji != other.emoji) return false
         if (message != other.message) return false

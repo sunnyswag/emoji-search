@@ -4,7 +4,7 @@ import android.content.Context
 import com.example.testbigfileread.MainViewModel.Companion.emojiEmbeddings
 import com.example.testbigfileread.MainViewModel.Companion.emojiInfoData
 import com.example.testbigfileread.R
-import com.example.testbigfileread.entity.EmojiJsonEntity
+import com.example.testbigfileread.entity.EmojiEmbeddingEntity
 import com.example.testbigfileread.processor.IProcessor
 import com.example.testbigfileread.processor.ProcessorType
 import com.google.gson.Gson
@@ -40,7 +40,7 @@ class EachLineProcessor : IProcessor {
         }.flowOn(Dispatchers.IO)
             .collect {
                 val i = index.getAndIncrement()
-                val entity = gson.fromJson(it, EmojiJsonEntity::class.java)
+                val entity = gson.fromJson(it, EmojiEmbeddingEntity::class.java)
                 emojiInfoData[i].emoji = entity.emoji
                 emojiInfoData[i].message = entity.message
                 emojiEmbeddings[i] = mk.ndarray(entity.embed)

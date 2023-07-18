@@ -3,7 +3,7 @@ package com.example.testbigfileread.processor.impl
 import EmojiEmbeddingOuterClass
 import android.content.Context
 import com.example.testbigfileread.R
-import com.example.testbigfileread.entity.EmojiJsonEntity
+import com.example.testbigfileread.entity.EmojiEmbeddingEntity
 import com.example.testbigfileread.processor.IProcessor
 import com.example.testbigfileread.processor.ProcessorType
 import com.google.gson.Gson
@@ -25,7 +25,7 @@ class JsonToProtoBufProcessor: IProcessor {
         context.resources.openRawResource(R.raw.emoji_embeddings_json).use { inputStream ->
             GZIPInputStream(inputStream).bufferedReader().useLines { lines ->
                 lines.forEach { line ->
-                    val entity = gson.fromJson(line, EmojiJsonEntity::class.java)
+                    val entity = gson.fromJson(line, EmojiEmbeddingEntity::class.java)
                     val pbEntity = EmojiEmbeddingOuterClass.EmojiEmbedding.newBuilder()
                         .setEmoji(entity.emoji)
                         .setMessage(entity.message)
