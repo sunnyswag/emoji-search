@@ -1,8 +1,11 @@
 package com.example.testbigfileread.entity
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
+@Entity(tableName = "emoji_embedding")
 data class EmojiEmbeddingEntity(
-    val emoji: String,
+    @PrimaryKey val emoji: String,
     val message: String,
     val embed: FloatArray
 ) {
