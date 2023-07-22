@@ -3,11 +3,13 @@ import json
 import os
 from typing import Dict, List
 import math
+import numpy as np
+import joblib
 
 import emoji
 import openai
 import tqdm
-import emoji_data.proto_emoji_embeddings.emoji_embedding_pb2 as pb2
+from sklearn.decomposition import PCA
 
 openai.api_key = os.environ["OPENAI_API_KEY"]
 openai.api_base = "https://api.openai.com/v1"
@@ -67,6 +69,22 @@ def extract_emoji_messages() -> Dict[str, str]:
 	emoji_dict_swap = {v: k for k, v in emojis_full_msg_dedupe.items()}
 	return emoji_dict_swap
 
+def transform_by_pca(embeddings: List[List[float]], n_components: int = 100) -> List[List[float]]:
+	pca = PCA(n_components=n_components)
+	pca.fit(embeddings)
+
+	save_pca_params(pca)
+	print_explained_variance_ratio(pca)
+
+	return pca.transform(embeddings)
+
+def save_pca_params(pca):
+	joblib.dump(pca, os.path.join(JSON_DATA_DIR, "pca_model.pkl"))
+
+def print_explained_variance_ratio(pca):
+    cumulative_variance_ratio = np.cumsum(pca.explained_variance_ratio_)
+    print("cumulative_variance_ratio: ", cumulative_variance_ratio)
+
 def main():
 	# Query embeddings
 	emoji_messages = extract_emoji_messages()
@@ -75,10 +93,11 @@ def main():
 
 	embeddings = get_embeddings(descriptions)
 	print("first embeddings of emoji: ", embeddings[0], "\nlen embeddings: ", len(embeddings))
+	embeddings = transform_by_pca(embeddings)
 
 	# Save embeddings
 	info = [
-		{"emoji": em, "message": msg, "embed": embed} 
+		{"emoji": em, "message": msg, "embed": embed.tolist()} 
 		for (em, msg), embed in zip(emoji_messages.items(), embeddings)
 	]
 	print("first 2th info of emoji: ", info[:2], "\nlen info: ", len(info))

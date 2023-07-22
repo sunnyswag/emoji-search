@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.zeros
+import org.jetbrains.kotlinx.multik.ndarray.data.get
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
@@ -25,13 +26,16 @@ class MainViewModel: ViewModel() {
     fun processInitialEmojiData(context: Context) {
         viewModelScope.launch {
             measureTime {
-                ProcessorFactory.doProcess(context, ProcessorType.DATABASE_PROCESSOR)
+                ProcessorFactory.doProcess(context, ProcessorType.PROTOBUF_PROCESSOR)
             }.also { duration ->
                 val emojiDataSize = emojiInfoData.filterNot { it.emoji.isEmpty() }.size
                 if (emojiDataSize != EMOJI_EMBEDDING_SIZE) {
                     Log.e(TAG, "the size of emojiInfoData is not correct, " +
                             "emojiInfoData.size: $emojiDataSize")
                 }
+
+                Log.i(TAG, "emoji: ${emojiInfoData[3].emoji}, message: ${emojiInfoData[3].message}")
+                Log.i(TAG, "embedding: ${emojiEmbeddings[3]}")
                 _timeSpend.value = duration
                 Log.d(TAG, "processInitialEmojiData time: $duration")
             }
