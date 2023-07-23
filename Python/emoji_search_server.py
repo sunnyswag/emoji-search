@@ -5,6 +5,7 @@ import jsonlines
 import numpy as np
 import openai
 from constants import *
+from typing import List
 from pca_module import load_pca_params
 
 openai.api_key = API_KEY
@@ -35,11 +36,11 @@ class EmojiSearchApp:
         self._embeddings = [x["embed"] for x in emoji_info]
         assert self._emojis is not None and self._embeddings is not None
 
-    def get_openai_embedding(self, text: str) -> list[float]:
+    def get_openai_embedding(self, text: str) -> List[float]:
         result = openai.Embedding.create(input=text, model=EMBEDDING_MODEL)
         return result["data"][0]["embedding"]
 
-    def get_top_relevant_emojis(self, query: str, k: int = 20) -> list[dict]:
+    def get_top_relevant_emojis(self, query: str, k: int = 20) -> List[dict]:
         query_embed = self.get_openai_embedding(query)
         query_embed = self._pca.transform(np.array(query_embed).reshape(1, -1))
 

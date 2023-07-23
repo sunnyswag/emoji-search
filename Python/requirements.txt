@@ -1,4 +1,8 @@
 emoji
 openai
 jsonlines
-sklearn
+scikit-learn
+numpy
+requests
+urllib3
+joblib
