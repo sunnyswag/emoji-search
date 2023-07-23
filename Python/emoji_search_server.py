@@ -4,27 +4,24 @@ import os
 import jsonlines
 import numpy as np
 import openai
-from sklearn.decomposition import PCA
-import joblib
+from constants import *
+from pca_module import load_pca_params
 
-openai.api_key = os.environ["OPENAI_API_KEY"]
-openai.api_base = "https://api.openai.com/v1"
-EMBEDDING_MODEL = "text-embedding-ada-002"
+openai.api_key = API_KEY
+openai.api_base = OPENAI_URL
 
-SERVER_DIR = os.path.dirname(os.path.abspath(__file__))
-EMBEDDING_DATA_DIR = os.path.join(SERVER_DIR, "emoji_data", "json_emoji_embeddings")
-EMBED_FILE = os.path.join(SERVER_DIR, os.path.join(EMBEDDING_DATA_DIR, "emoji_embeddings_json.gz"))
+EMBED_FILE = os.path.join(EMBEDDING_DATA_DIR, "emoji_embeddings_json.gz")
 
 class EmojiSearchApp:
     def __init__(self):
         self._emojis = None
         self._embeddings = None
-        self._pca = PCA(n_components=100)
+        self._pca = None
         self._load_emoji_embeddings()
         self._load_pca_model()
 
     def _load_pca_model(self):
-        self._pca = joblib.load(os.path.join(EMBEDDING_DATA_DIR, "pca_model.pkl"))
+        self._pca = load_pca_params()
 
     def _load_emoji_embeddings(self):
         if self._emojis is not None and self._embeddings is not None:
