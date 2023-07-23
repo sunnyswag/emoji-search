@@ -5,4 +5,3 @@ scikit-learn
 numpy
 requests
 urllib3
-joblib

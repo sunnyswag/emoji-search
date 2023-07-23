@@ -3,7 +3,7 @@ import json
 import os
 from typing import Dict, List
 from constants import *
-from pca_module import transform_by_pca
+import math
 
 import emoji
 import openai
@@ -27,6 +27,16 @@ def write_to_json(filename: str, data: List[Dict]):
         with gzip.GzipFile(fileobj=fp, mode="wb") as gz:
             for x in tqdm.tqdm(data):
                 gz.write((json.dumps(x) + "\n").encode("utf-8"))
+		
+def getchunks(data: List[Dict], num_files: int = 5):
+	chunk_size = math.ceil(len(data) / num_files)
+	chunks = [data[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
+	return chunks
+
+def write_to_json_with_chunks(filename_base: str, chunks: List[List[Dict]]):
+	for i, chunk in enumerate(chunks):
+		filename = f"{filename_base}_{i}"
+		write_to_json(filename, chunk)
 
 def extract_emoji_messages() -> Dict[str, str]:
 	with open(os.path.join(EMOJI_DATA_DIR, "emoji-data.txt"), encoding="utf-8") as file:
@@ -60,17 +70,17 @@ def main():
 
 	embeddings = get_embeddings(descriptions)
 	print("first embeddings of emoji: ", embeddings[0], "\nlen embeddings: ", len(embeddings))
-	embeddings = transform_by_pca(embeddings)
 
 	# Save embeddings
 	info = [
-		{"emoji": em, "message": msg, "embed": embed.tolist()} 
+		{"emoji": em, "message": msg, "embed": embed} 
 		for (em, msg), embed in zip(emoji_messages.items(), embeddings)
 	]
 	print("first 2th info of emoji: ", info[:2], "\nlen info: ", len(info))
 
 	json_output_filename = os.path.join(EMBEDDING_DATA_DIR, "emoji_embeddings_json")
 	write_to_json(json_output_filename, info)
+	write_to_json_with_chunks(json_output_filename, getchunks(info))
 
 if __name__ == "__main__":
 	main()

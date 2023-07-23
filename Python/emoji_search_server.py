@@ -6,7 +6,6 @@ import numpy as np
 import openai
 from constants import *
 from typing import List
-from pca_module import load_pca_params
 
 openai.api_key = API_KEY
 openai.api_base = OPENAI_URL
@@ -17,12 +16,7 @@ class EmojiSearchApp:
     def __init__(self):
         self._emojis = None
         self._embeddings = None
-        self._pca = None
         self._load_emoji_embeddings()
-        self._load_pca_model()
-
-    def _load_pca_model(self):
-        self._pca = load_pca_params()
 
     def _load_emoji_embeddings(self):
         if self._emojis is not None and self._embeddings is not None:
@@ -31,7 +25,7 @@ class EmojiSearchApp:
         with gzip.GzipFile(fileobj=open(EMBED_FILE, "rb"), mode="rb") as fin:
             emoji_info = list(jsonlines.Reader(fin))
 
-        print("Lazy loading embedding info ...")
+        print("loading embedding info ...")
         self._emojis = [(x["emoji"], x["message"]) for x in emoji_info]
         self._embeddings = [x["embed"] for x in emoji_info]
         assert self._emojis is not None and self._embeddings is not None
@@ -42,9 +36,8 @@ class EmojiSearchApp:
 
     def get_top_relevant_emojis(self, query: str, k: int = 20) -> List[dict]:
         query_embed = self.get_openai_embedding(query)
-        query_embed = self._pca.transform(np.array(query_embed).reshape(1, -1))
 
-        dotprod = np.matmul(self._embeddings, np.array(query_embed).T).flatten()
+        dotprod = np.matmul(self._embeddings, np.array(query_embed).T)
         m_dotprod = np.median(dotprod)
         ind = np.argpartition(dotprod, -k)[-k:]
         ind = ind[np.argsort(dotprod[ind])][::-1]
