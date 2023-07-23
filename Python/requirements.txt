@@ -1,7 +1,4 @@
 emoji
 openai
 jsonlines
-scikit-learn
 numpy
-requests
-urllib3
