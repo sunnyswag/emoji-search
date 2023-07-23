@@ -41,7 +41,7 @@ class AppInitializer : Initializer<Unit> {
     companion object {
         const val TAG = "AppInitializer"
         const val EMOJI_EMBEDDING_SIZE = 3753
-        const val EMBEDDING_LENGTH_PER_EMOJI = 3072
+        const val EMBEDDING_LENGTH_PER_EMOJI = 1536
         // size: 3753, 1536
         val emojiEmbeddings = mk.zeros<Float>(EMOJI_EMBEDDING_SIZE, EMBEDDING_LENGTH_PER_EMOJI)
         val emojiInfoData: List<EmojiInfoEntity> = List(EMOJI_EMBEDDING_SIZE) {
