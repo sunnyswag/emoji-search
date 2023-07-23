@@ -18,3 +18,4 @@ dependencyResolutionManagement {
 rootProject.name = "emojiSemanticSearch"
 include ':app'
 include ':testbigfileread'
+include ':emoji-data-reader'
