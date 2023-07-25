@@ -1,18 +1,14 @@
 package com.example.emojisemanticsearch.network
 
 import android.util.Log
-import com.example.emojisemanticsearch.entity.EmbeddingRequest
-import com.example.emojisemanticsearch.entity.EmbeddingResponse
-import com.example.emojisemanticsearch.startup.AppInitializer.Companion.EMBEDDING_LENGTH_PER_EMOJI
-import com.example.emojisemanticsearch.startup.AppInitializer.Companion.EMOJI_EMBEDDING_SIZE
-import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiInfoData
-import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiEmbeddings
+import com.example.emoji_data_reader.processor.ProcessorFactory.EMBEDDING_LENGTH_PER_EMOJI
+import com.example.emoji_data_reader.processor.ProcessorFactory.emojiEmbeddings
+import com.example.emojisemanticsearch.network.entity.EmbeddingRequest
+import com.example.emojisemanticsearch.network.entity.EmbeddingResponse
 import org.jetbrains.kotlinx.multik.api.linalg.dot
 import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.api.ndarray
 import org.jetbrains.kotlinx.multik.ndarray.operations.toList
-import java.lang.Float.max
-import java.lang.Float.min
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -31,7 +27,7 @@ class EmbeddingRepository(private val openAIAPI: OpenAIAPI) {
                         val embeddingReshaped =
                             mk.ndarray(embedding).reshape(EMBEDDING_LENGTH_PER_EMOJI, 1)
                         val dotResult = emojiEmbeddings.dot(embeddingReshaped).flatten().toList()
-                        result = topKIndices(dotResult, getScaledTopK(topK))
+                        result = topKIndices(dotResult, topK)
                     }.also { Log.d(TAG, "getEmbedding process time: $it") }
                     result
                 } else {
@@ -48,13 +44,6 @@ class EmbeddingRepository(private val openAIAPI: OpenAIAPI) {
         fun topKIndices(list: List<Float>, k: Int): List<Int> {
             val indices = List(list.size) { index -> index }
             return indices.sortedByDescending { list[it] }.take(k)
-        }
-
-        fun getScaledTopK(topK: Int): Int {
-            val scale = min(1f, max(0.2f, emojiInfoData.size / EMOJI_EMBEDDING_SIZE.toFloat()))
-            return (topK * scale).toInt().also {
-                Log.d(TAG, "scaled topK: $it, topK: $topK, scale: $scale")
-            }
         }
     }
 }

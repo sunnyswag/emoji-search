@@ -1,8 +1,0 @@
-// emoji_embedding.proto
-syntax = "proto3";
-
-message EmojiEmbedding {
-    string emoji = 1;
-    string message = 2;
-    repeated float embed = 3;
-}

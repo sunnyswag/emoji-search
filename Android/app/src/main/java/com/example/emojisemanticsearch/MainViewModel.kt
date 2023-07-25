@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.emojisemanticsearch.entity.EmojiInfoEntity
+import com.example.emoji_data_reader.processor.ProcessorFactory.emojiInfoData
 import com.example.emojisemanticsearch.network.EmbeddingRepository
-import com.example.emojisemanticsearch.startup.AppInitializer.Companion.emojiInfoData
+import com.example.model.EmojiInfoEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

@@ -3,12 +3,13 @@ package com.example.emojisemanticsearch.startup
 import android.content.Context
 import android.util.Log
 import androidx.startup.Initializer
-import com.example.emojisemanticsearch.entity.EmojiInfoEntity
+import com.example.emoji_data_reader.processor.ProcessorFactory
+import com.example.emoji_data_reader.processor.ProcessorFactory.EMOJI_EMBEDDING_SIZE
+import com.example.emoji_data_reader.processor.ProcessorFactory.emojiInfoData
+import com.example.emoji_data_reader.processor.ProcessorType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.kotlinx.multik.api.mk
-import org.jetbrains.kotlinx.multik.api.zeros
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -35,17 +36,10 @@ class AppInitializer : Initializer<Unit> {
     }
 
     private suspend fun readEmojiEmbeddings(context: Context) {
-        ProtobufProcessor().process(context)
+        ProcessorFactory.doProcess(context, ProcessorType.PROTOBUF_PROCESSOR)
     }
 
     companion object {
         const val TAG = "AppInitializer"
-        const val EMOJI_EMBEDDING_SIZE = 3753
-        const val EMBEDDING_LENGTH_PER_EMOJI = 1536
-        // size: 3753, 1536
-        val emojiEmbeddings = mk.zeros<Float>(EMOJI_EMBEDDING_SIZE, EMBEDDING_LENGTH_PER_EMOJI)
-        val emojiInfoData: List<EmojiInfoEntity> = List(EMOJI_EMBEDDING_SIZE) {
-            EmojiInfoEntity("", "")
-        }
     }
 }

@@ -4,14 +4,12 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.testbigfileread.entity.EmojiInfoEntity
-import com.example.testbigfileread.processor.ProcessorFactory
-import com.example.testbigfileread.processor.ProcessorType
+import com.example.emoji_data_reader.processor.ProcessorFactory
+import com.example.emoji_data_reader.processor.ProcessorFactory.EMOJI_EMBEDDING_SIZE
+import com.example.emoji_data_reader.processor.ProcessorFactory.emojiInfoData
+import com.example.emoji_data_reader.processor.ProcessorType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import org.jetbrains.kotlinx.multik.api.mk
-import org.jetbrains.kotlinx.multik.api.zeros
-import org.jetbrains.kotlinx.multik.ndarray.data.get
 import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
@@ -26,7 +24,7 @@ class MainViewModel: ViewModel() {
     fun processInitialEmojiData(context: Context) {
         viewModelScope.launch {
             measureTime {
-                ProcessorFactory.doProcess(context, ProcessorType.PROTOBUF_PROCESSOR)
+                ProcessorFactory.doProcess(context, ProcessorType.JSON_EACH_LINE_PROCESSOR)
             }.also { duration ->
                 val emojiDataSize = emojiInfoData.filterNot { it.emoji.isEmpty() }.size
                 if (emojiDataSize != EMOJI_EMBEDDING_SIZE) {
@@ -35,7 +33,6 @@ class MainViewModel: ViewModel() {
                 }
 
                 Log.i(TAG, "emoji: ${emojiInfoData[3].emoji}, message: ${emojiInfoData[3].message}")
-                Log.i(TAG, "embedding: ${emojiEmbeddings[3]}")
                 _timeSpend.value = duration
                 Log.d(TAG, "processInitialEmojiData time: $duration")
             }
@@ -45,13 +42,5 @@ class MainViewModel: ViewModel() {
 
     companion object {
         private const val TAG = "MainViewModel"
-        const val EMOJI_EMBEDDING_SIZE = 3753
-        private const val EMBEDDING_LENGTH_PER_EMOJI = 1536
-
-        // size: 3753, 1536
-        val emojiEmbeddings = mk.zeros<Float>(EMOJI_EMBEDDING_SIZE, EMBEDDING_LENGTH_PER_EMOJI)
-        val emojiInfoData: List<EmojiInfoEntity> = List(EMOJI_EMBEDDING_SIZE) {
-            EmojiInfoEntity("", "")
-        }
     }
 }
