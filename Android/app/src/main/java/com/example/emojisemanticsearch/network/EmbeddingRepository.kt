@@ -19,7 +19,7 @@ class EmbeddingRepository(private val openAIAPI: OpenAIAPI) {
         return kotlin.runCatching {
             var networkResult: EmbeddingResponse
             measureTime { networkResult = openAIAPI.getEmbedding(EmbeddingRequest(userInput)) }
-                .also { Log.d(TAG, "getEmbedding network time: $it") }
+                .also { Log.d(TAG, "getEmbedding network time cost: $it") }
             networkResult.embeddings.firstOrNull()?.embedding?.let { embedding ->
                 if (embedding.size == EMBEDDING_LENGTH_PER_EMOJI) {
                     var result: List<Int>?
