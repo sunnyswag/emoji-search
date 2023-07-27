@@ -52,35 +52,35 @@ android {
 }
 
 dependencies {
-    implementation project(':core:model')
-    implementation project(":core:emoji-data-reader")
+    implementation(project(":core:model"))
+    implementation(project(":core:emoji-data-reader"))
 
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    implementation 'androidx.activity:activity-compose:1.7.0'
-    implementation platform('androidx.compose:compose-bom:2022.10.00')
-    implementation 'androidx.compose.ui:ui'
-    implementation 'androidx.compose.ui:ui-graphics'
-    implementation 'androidx.compose.ui:ui-tooling-preview'
-    implementation 'androidx.compose.material3:material3'
-    implementation 'androidx.startup:startup-runtime:1.1.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.6.1'
+    implementation(libs.coreKtx)
+    implementation(libs.lifecycleRuntimeKtx)
+    implementation(libs.activityCompose)
+    implementation(platform(libs.composeBom))
+    implementation(libs.composeUi)
+    implementation(libs.material3)
+    implementation(libs.composeUiGraphics)
+    implementation(libs.composeUiToolingPreview)
+    implementation(libs.startupRuntime)
+    implementation(libs.lifecycleViewmodelCompose)
+    implementation(libs.lifecycleRuntimeCompose)
 
-    implementation 'com.google.accompanist:accompanist-systemuicontroller:0.30.1'
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation(libs.accompanistSystemuiController)
+    implementation(libs.gson)
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
-    implementation "org.jetbrains.kotlinx:multik-core:0.2.2"
-    implementation "org.jetbrains.kotlinx:multik-kotlin:0.2.2"
+    implementation(libs.coroutinesCore)
+    implementation(libs.coroutinesAndroid)
+    implementation(libs.multikCore)
+    implementation(libs.multikKotlin)
 
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation(libs.okhttp)
+    implementation(libs.retrofit)
+    implementation(libs.converterGson)
 
-    implementation "io.insert-koin:koin-android:3.4.1"
+    implementation(libs.koinAndroid)
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidxTestJunit)
 }

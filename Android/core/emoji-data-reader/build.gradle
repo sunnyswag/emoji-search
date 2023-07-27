@@ -49,21 +49,17 @@ protobuf {
 dependencies {
     implementation project(':core:model')
 
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.0')
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    implementation "org.jetbrains.kotlinx:multik-core:0.2.2"
-    implementation "org.jetbrains.kotlinx:multik-kotlin:0.2.2"
+    implementation(libs.coreKtx)
+    implementation(platform(libs.kotlinBom))
+    implementation(libs.appcompat)
+    implementation(libs.material)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.espressoCore)
+    implementation(libs.multikCore)
+    implementation(libs.multikKotlin)
+    implementation(libs.gson)
+    implementation(libs.protobufJavalite)
 
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'com.google.protobuf:protobuf-javalite:3.21.12'
-
-    def room_version = "2.5.1"
-
-    implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
+    implementation(libs.roomRuntime)
+    kapt(libs.roomCompiler)
 }
