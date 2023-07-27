@@ -22,6 +22,7 @@ import com.example.emojisemanticsearch.ui.item.ErrorPage
 import com.example.emojisemanticsearch.ui.item.LoadingPage
 import com.example.emojisemanticsearch.ui.item.SearchEmojiField
 import com.example.emojisemanticsearch.ui.theme.EmojiSemanticSearchTheme
+import com.example.emojisemanticsearch.utils.limitLength
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : ComponentActivity() {
@@ -54,7 +55,7 @@ class MainActivity : ComponentActivity() {
 
             SearchEmojiField(modifier = Modifier.fillMaxWidth(),
                 onSearch = {
-                    viewModel.searchEmojis(it)
+                    viewModel.searchEmojis(it.limitLength())
                     controller?.hide()
                 }, onClickDeleteAll = {
                     viewModel.initState()
@@ -89,6 +90,7 @@ class MainActivity : ComponentActivity() {
 
             is UiState.Default -> {
                 DefaultPage(modifier)
+                controller?.show()
             }
         }
     }

@@ -13,3 +13,11 @@ fun saveToClipboard(context: Context, str: String) {
     val clip = ClipData.newPlainText("label", str)
     clipboard.setPrimaryClip(clip)
 }
+
+fun String.limitLength(maxLen: Int = 30): String {
+    return if (this.length > maxLen) {
+        this.substring(0, maxLen)
+    } else {
+        this
+    }
+}
