@@ -12,7 +12,7 @@ import tqdm
 openai.api_key = API_KEY
 openai.api_base = OPENAI_URL
 
-def get_embeddings(inps: List[str], batch: int=1000, inp_type: str="doc") -> List[List[float]]:
+def get_embeddings(inps: List[str], batch: int=1000) -> List[List[float]]:
 	i = 0
 	outputs = []
 	while i < len(inps):

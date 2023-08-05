@@ -7,6 +7,7 @@ import com.example.emoji_data_reader.processor.ProcessorFactory.emojiEmbeddings
 import com.example.emoji_data_reader.processor.ProcessorFactory.emojiInfoData
 import com.example.emoji_data_reader.processor.ProcessorType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
@@ -23,6 +24,7 @@ internal class ProtobufProcessor: IProcessor {
     private var index = AtomicInteger(0)
     override val processorType = ProcessorType.PROTOBUF_PROCESSOR
 
+    @OptIn(FlowPreview::class)
     override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
         flow {
             context.resources.openRawResource(R.raw.emoji_embeddings_proto).use { inputStream ->
