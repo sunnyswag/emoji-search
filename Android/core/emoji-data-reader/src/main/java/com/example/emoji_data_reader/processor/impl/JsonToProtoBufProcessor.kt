@@ -20,8 +20,8 @@ internal class JsonToProtoBufProcessor: IProcessor {
     override val processorType: ProcessorType
         get() = ProcessorType.JSON_TO_PROTOBUF_PROCESSOR
 
-    override suspend fun process(context: Context) = withContext(Dispatchers.IO) {
-        context.resources.openRawResource(R.raw.emoji_embeddings_json).use { inputStream ->
+    override suspend fun process(context: Context, rawFileIds: List<Int>) = withContext(Dispatchers.IO) {
+        context.resources.openRawResource(rawFileIds.first()).use { inputStream ->
             GZIPInputStream(inputStream).bufferedReader().useLines { lines ->
                 lines.forEach { line ->
                     val entity = gson.fromJson(line, EmojiEmbeddingEntity::class.java)

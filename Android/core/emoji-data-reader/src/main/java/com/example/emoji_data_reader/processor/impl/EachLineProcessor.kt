@@ -24,11 +24,11 @@ internal class EachLineProcessor : IProcessor {
 
     override val processorType = ProcessorType.JSON_EACH_LINE_PROCESSOR
 
-    override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
+    override suspend fun process(context: Context, rawFileIds: List<Int>) = withContext(Dispatchers.Default) {
         val index = AtomicInteger(0)
 
         flow {
-            context.resources.openRawResource(R.raw.emoji_embeddings_json).use { inputStream ->
+            context.resources.openRawResource(rawFileIds.first()).use { inputStream ->
                 GZIPInputStream(inputStream).use { gzipInputStream ->
                     gzipInputStream.bufferedReader().useLines { lines ->
                         for (line in lines) {

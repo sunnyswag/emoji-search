@@ -16,7 +16,7 @@ internal class DatabaseLoadProcessor: IProcessor {
     override val processorType: ProcessorType
         get() = ProcessorType.DATABASE_PROCESSOR
 
-    override suspend fun process(context: Context) = withContext(Dispatchers.IO) {
+    override suspend fun process(context: Context, rawFileIds: List<Int>) = withContext(Dispatchers.IO) {
         val embeddingDao = getEmbeddingEntityDao(context)
         embeddingDao.queryAll()?.forEachIndexed { index, emojiEmbeddingEntity ->
             emojiInfoData[index].emoji = emojiEmbeddingEntity.emoji

@@ -25,9 +25,9 @@ internal class ProtobufProcessor: IProcessor {
     override val processorType = ProcessorType.PROTOBUF_PROCESSOR
 
     @OptIn(FlowPreview::class)
-    override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
+    override suspend fun process(context: Context, rawFileIds: List<Int>) = withContext(Dispatchers.Default) {
         flow {
-            context.resources.openRawResource(R.raw.emoji_embeddings_proto).use { inputStream ->
+            context.resources.openRawResource(rawFileIds.first()).use { inputStream ->
                 GZIPInputStream(inputStream).buffered().use { gzipInputStream ->
                     while (true) {
                         EmojiEmbeddingOuterClass.EmojiEmbedding.parseDelimitedFrom(gzipInputStream)?.let {

@@ -7,6 +7,7 @@ import com.example.emoji_data_reader.processor.ProcessorFactory
 import com.example.emoji_data_reader.processor.ProcessorFactory.EMOJI_EMBEDDING_SIZE
 import com.example.emoji_data_reader.processor.ProcessorFactory.emojiInfoData
 import com.example.emoji_data_reader.processor.ProcessorType
+import com.example.emojisemanticsearch.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,7 +37,11 @@ class AppInitializer : Initializer<Unit> {
     }
 
     private suspend fun readEmojiEmbeddings(context: Context) {
-        ProcessorFactory.doProcess(context, ProcessorType.PROTOBUF_PROCESSOR)
+        ProcessorFactory.doProcess(
+            context,
+            ProcessorType.PROTOBUF_PROCESSOR,
+            listOf(R.raw.emoji_embeddings_proto)
+        )
     }
 
     companion object {

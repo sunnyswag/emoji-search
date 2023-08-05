@@ -21,8 +21,8 @@ internal class DefaultProcessor : IProcessor {
 
     override val processorType = ProcessorType.DEFAULT_JSON_PROCESSOR
 
-    override suspend fun process(context: Context) = withContext(Dispatchers.IO) {
-        context.resources.openRawResource(R.raw.emoji_embeddings_json).use { inputStream ->
+    override suspend fun process(context: Context, rawFileIds: List<Int>) = withContext(Dispatchers.IO) {
+        context.resources.openRawResource(rawFileIds.first()).use { inputStream ->
             GZIPInputStream(inputStream).bufferedReader().use { bufferedReader ->
                 bufferedReader.readLines().forEachIndexed { index, line ->
                     val entity = gson.fromJson(line, EmojiEmbeddingEntity::class.java)

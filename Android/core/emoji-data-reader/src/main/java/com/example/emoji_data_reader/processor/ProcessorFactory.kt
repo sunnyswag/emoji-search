@@ -23,8 +23,8 @@ object ProcessorFactory {
         DatabaseLoadProcessor()
     )
 
-    suspend fun doProcess(context: Context, processorType: ProcessorType) {
-        processors.find { it.processorType == processorType }?.process(context)
+    suspend fun doProcess(context: Context, processorType: ProcessorType, rawFileIds: List<Int>) {
+        processors.find { it.processorType == processorType }?.process(context, rawFileIds)
             ?: throw ProcessorNotFoundException("the $processorType processor not support!")
     }
 

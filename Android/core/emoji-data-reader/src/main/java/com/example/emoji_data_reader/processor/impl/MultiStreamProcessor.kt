@@ -1,7 +1,6 @@
 package com.example.emoji_data_reader.processor.impl
 
 import android.content.Context
-import com.example.emoji_data_reader.R
 import com.example.model.EmojiEmbeddingEntity
 import com.example.emoji_data_reader.processor.IProcessor
 import com.example.emoji_data_reader.processor.ProcessorFactory.emojiEmbeddings
@@ -27,14 +26,13 @@ internal class MultiStreamProcessor : IProcessor {
 
     override val processorType = ProcessorType.JSON_EACH_LINE_MULTI_STREAM_PROCESSOR
 
-    override suspend fun process(context: Context) = withContext(Dispatchers.Default) {
+    override suspend fun process(context: Context, rawFileIds: List<Int>) = withContext(Dispatchers.Default) {
         var index = 0
         val mutex = Mutex()
 
         List(STREAM_SIZE) { i ->
             flow {
-                val resId = getEmbeddingResId(i)
-                context.resources.openRawResource(resId).use { inputStream ->
+                context.resources.openRawResource(rawFileIds[i]).use { inputStream ->
                     GZIPInputStream(inputStream).use { gzipInputStream ->
                         gzipInputStream.bufferedReader().useLines { lines ->
                             for (line in lines) {
@@ -55,15 +53,6 @@ internal class MultiStreamProcessor : IProcessor {
                     index++
                 }
             }
-    }
-
-    private fun getEmbeddingResId(i: Int) = when (i) {
-        0 -> R.raw.emoji_embeddings_json_0
-        1 -> R.raw.emoji_embeddings_json_1
-        2 -> R.raw.emoji_embeddings_json_2
-        3 -> R.raw.emoji_embeddings_json_3
-        4 -> R.raw.emoji_embeddings_json_4
-        else -> throw IllegalArgumentException("Invalid index: $i")
     }
 
     companion object {

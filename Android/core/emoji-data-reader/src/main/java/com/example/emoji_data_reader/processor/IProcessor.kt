@@ -6,5 +6,5 @@ internal interface IProcessor {
 
     val processorType: ProcessorType
 
-    suspend fun process(context: Context)
+    suspend fun process(context: Context, rawFileIds: List<Int>)
 }
