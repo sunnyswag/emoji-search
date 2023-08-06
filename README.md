@@ -173,9 +173,9 @@ SOFTWARE.
 
 [https://github.com/carpedm20/emoji](https://github.com/carpedm20/emoji)：提供了 Emoji 相关的数据
 
-https://github.com/zenled/Emoji_Browser：提供了 Emoji APP 的 Icon
+[https://github.com/zenled/Emoji_Browser](https://github.com/zenled/Emoji_Browser)：提供了 Emoji APP 的 Icon
 
-https://fonts.google.com/icons：提供了 Material 相关的 Icon
+[https://fonts.google.com/icons](https://fonts.google.com/icons)：提供了 Material 相关的 Icon
 
 ## 🔗 REFERENCE
 

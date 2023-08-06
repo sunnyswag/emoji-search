@@ -171,9 +171,9 @@ Thank you in advance for your contribution!
 
 [https://github.com/carpedm20/emoji](https://github.com/carpedm20/emoji): Provides Emoji related data
 
-https://github.com/zenled/Emoji_Browser：Provide the Icon of Emoji APP
+[https://github.com/zenled/Emoji_Browser](https://github.com/zenled/Emoji_Browser)：Provide the Icon of Emoji APP
 
-https://fonts.google.com/icons：Provide the material Icons 
+[https://fonts.google.com/icons](https://fonts.google.com/icons)：Provide the material Icons 
 
 ## 🔗 REFERENCE
 
