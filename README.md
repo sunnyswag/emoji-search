@@ -2,7 +2,7 @@
 
 输入一段你对于相关 Emoji 的描述，来找到对应的 Emoji 表情
 
-详细的构建过程和技术文档可以查看 掘金
+详细的构建过程和技术文档可以查看 [掘金](https://juejin.cn/post/7264073604496638011)
 
 [English README.md](./README.EN.md)
 
@@ -172,6 +172,10 @@ SOFTWARE.
 [UTS #51: Unicode Emoji](https://www.unicode.org/reports/tr51/tr51-21.html)：提供了 Emoji 相关的数据
 
 [https://github.com/carpedm20/emoji](https://github.com/carpedm20/emoji)：提供了 Emoji 相关的数据
+
+https://github.com/zenled/Emoji_Browser：提供了 Emoji APP 的 Icon
+
+https://fonts.google.com/icons：提供了 Material 相关的 Icon
 
 ## 🔗 REFERENCE
 

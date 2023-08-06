@@ -2,7 +2,7 @@
 
 Enter a description of the relevant emoji to find the corresponding emoji
 
-The detailed construction process and technical documents can be viewed on [JueJin](https://juejin.cn/)
+The detailed construction process and technical documents can be viewed on [JueJin](https://juejin.cn/post/7264073604496638011)
 
 ## 🎥 Feature Preview
 
@@ -170,6 +170,10 @@ Thank you in advance for your contribution!
 [UTS #51: Unicode Emoji](https://www.unicode.org/reports/tr51/tr51-21.html): Provides Emoji related data
 
 [https://github.com/carpedm20/emoji](https://github.com/carpedm20/emoji): Provides Emoji related data
+
+https://github.com/zenled/Emoji_Browser：Provide the Icon of Emoji APP
+
+https://fonts.google.com/icons：Provide the material Icons 
 
 ## 🔗 REFERENCE
 
