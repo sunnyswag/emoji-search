@@ -24,7 +24,8 @@ class MainViewModel: ViewModel() {
     fun processInitialEmojiData(context: Context) {
         viewModelScope.launch {
             measureTime {
-                ProcessorFactory.doProcess(context, ProcessorType.JSON_EACH_LINE_PROCESSOR)
+                ProcessorFactory.doProcess(context,
+                    ProcessorType.JSON_EACH_LINE_PROCESSOR)
             }.also { duration ->
                 val emojiDataSize = emojiInfoData.filterNot { it.emoji.isEmpty() }.size
                 if (emojiDataSize != EMOJI_EMBEDDING_SIZE) {
