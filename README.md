@@ -4,6 +4,8 @@
 
 详细的构建过程和技术文档可以查看 掘金
 
+[English README.md](./README.EN.md)
+
 ## 🎥 功能预览
 
 ![emoji-search-app-demo](./assets/emoji-search-app-demo.gif)
