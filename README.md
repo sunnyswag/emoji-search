@@ -2,7 +2,7 @@
 
 输入一段你对于相关 Emoji 的描述，来找到对应的 Emoji 表情
 
-详细的构建过程和技术文档可以查看 [掘金](https://juejin.cn/post/7264073604496638011)
+详细的构建过程和技术文档可以查看 [掘金](https://juejin.cn/spost/7264073604496638011)
 
 [English README.md](./README.EN.md)
 

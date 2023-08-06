@@ -2,7 +2,7 @@
 
 Enter a description of the relevant emoji to find the corresponding emoji
 
-The detailed construction process and technical documents can be viewed on [JueJin](https://juejin.cn/post/7264073604496638011)
+The detailed construction process and technical documents can be viewed on [JueJin](https://juejin.cn/spost/7264073604496638011)
 
 ## 🎥 Feature Preview
 
